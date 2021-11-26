@@ -2,21 +2,6 @@ import type { JsonHtml } from "./jsonhtml";
 import { div } from "./jsonhtml";
 import { renderToDom } from "./render";
 
-export const newProbe = <T>(): [
-  captureData: (it: T) => void,
-  getCapturedData: () => T[]
-] => {
-  let data: T[] = [];
-  return [
-    (it) => data.push(it),
-    () => {
-      const lastArgs = data;
-      data = [];
-      return lastArgs;
-    },
-  ];
-};
-
 test.each<[string, JsonHtml, string]>([
   ["simple element", div(), "<div></div>"],
   ["undefined", undefined, ""],
@@ -86,8 +71,9 @@ test.each<[string, JsonHtml, string]>([
 });
 
 test('renderToDom should render "event handler"', () => {
-  const [handle, getResults] = newProbe();
-  const result = renderToDom(div({ onClick: handle }));
+  const callback = jest.fn();
+
+  const result = renderToDom(div({ onClick: callback }));
   (result as HTMLElement).click();
-  expect(getResults().length).toEqual(1);
+  expect(callback.mock.calls.length).toEqual(1);
 });
