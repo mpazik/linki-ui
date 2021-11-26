@@ -9,6 +9,9 @@ export const renderNode = (
   attrs: Attributes,
   children: Node[]
 ): Node => {
+  if (tag === "dom") {
+    return attrs["element"] as Element;
+  }
   const node = document.createElement(tag);
 
   for (const attrKey of Object.keys(attrs)) {
