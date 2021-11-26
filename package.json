@@ -1,6 +1,6 @@
 {
   "name": "linki-ui",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "linki dom render component and set of utilities to integrate with dom API",
   "keywords": [
     "front-end",
