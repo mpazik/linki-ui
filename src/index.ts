@@ -1,3 +1,2 @@
-export const helloWorld = (): void => {
-  console.log("Hello world");
-};
+export { renderJsonHtmlToDom } from "./render";
+export * from "./jsonhtml";

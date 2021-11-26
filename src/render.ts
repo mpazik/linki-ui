@@ -4,11 +4,7 @@ import type { Attributes } from "./jsonml";
 
 const expliciteBooleanAttributes = ["contenteditable", "draggable"];
 
-export const renderNode = (
-  tag: string,
-  attrs: Attributes,
-  children: Node[]
-): Node => {
+const renderNode = (tag: string, attrs: Attributes, children: Node[]): Node => {
   if (tag === "dom") {
     return attrs["element"] as Element;
   }
@@ -53,7 +49,7 @@ export const renderNode = (
   return node;
 };
 
-export const renderToDom = (elem: JsonHtml): Node => {
+export const renderJsonHtmlToDom = (elem: JsonHtml): Node => {
   const nodes = mapJsonHtml<Node>(
     elem,
     (string) => document.createTextNode(string),

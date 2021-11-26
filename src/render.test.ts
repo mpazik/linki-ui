@@ -1,6 +1,6 @@
 import type { JsonHtml } from "./jsonhtml";
 import { div, dom } from "./jsonhtml";
-import { renderToDom } from "./render";
+import { renderJsonHtmlToDom } from "./render";
 
 test.each<[string, JsonHtml, string]>([
   ["simple element", div(), "<div></div>"],
@@ -67,14 +67,14 @@ test.each<[string, JsonHtml, string]>([
   ["dom element", [dom(document.createElement("div"))], "<div></div>"],
 ])(`renderToDom should render %p`, (name, input, result) => {
   const parent = document.createElement("div");
-  parent.appendChild(renderToDom(input));
+  parent.appendChild(renderJsonHtmlToDom(input));
   expect(parent.innerHTML).toEqual(result);
 });
 
 test('renderToDom should render "event handler"', () => {
   const callback = jest.fn();
 
-  const result = renderToDom(div({ onClick: callback }));
+  const result = renderJsonHtmlToDom(div({ onClick: callback }));
   (result as HTMLElement).click();
   expect(callback.mock.calls.length).toEqual(1);
 });
