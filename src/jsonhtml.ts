@@ -23,9 +23,10 @@ type JsonHtmlTagFactory<T extends HtmlTag> = (
   ...props: TagProps<T>
 ) => JsonHtml;
 
-const newTagFactory = <T extends HtmlTag>(tag: T): JsonHtmlTagFactory<T> => (
-  ...props: [Attributes[T], ...JsonHtml[]] | [...JsonHtml[]]
-): JsonHtml => [tag, ...props] as JsonHtml;
+const newTagFactory =
+  <T extends HtmlTag>(tag: T): JsonHtmlTagFactory<T> =>
+  (...props: [Attributes[T], ...JsonHtml[]] | [...JsonHtml[]]): JsonHtml =>
+    [tag, ...props] as JsonHtml;
 
 // Custom tag
 export const dom = (element: Element): JsonHtml => ["dom", { element }];
@@ -48,9 +49,8 @@ export const b: JsonHtmlTagFactory<"b"> = newTagFactory("b");
 export const base: JsonHtmlTagFactory<"base"> = newTagFactory("base");
 export const bdi: JsonHtmlTagFactory<"bdi"> = newTagFactory("bdi");
 export const bdo: JsonHtmlTagFactory<"bdo"> = newTagFactory("bdo");
-export const blockquote: JsonHtmlTagFactory<"blockquote"> = newTagFactory(
-  "blockquote"
-);
+export const blockquote: JsonHtmlTagFactory<"blockquote"> =
+  newTagFactory("blockquote");
 export const body: JsonHtmlTagFactory<"body"> = newTagFactory("body");
 export const br: JsonHtmlTagFactory<"br"> = newTagFactory("br");
 export const button: JsonHtmlTagFactory<"button"> = newTagFactory("button");
@@ -59,13 +59,11 @@ export const caption: JsonHtmlTagFactory<"caption"> = newTagFactory("caption");
 export const cite: JsonHtmlTagFactory<"cite"> = newTagFactory("cite");
 export const code: JsonHtmlTagFactory<"code"> = newTagFactory("code");
 export const col: JsonHtmlTagFactory<"col"> = newTagFactory("col");
-export const colgroup: JsonHtmlTagFactory<"colgroup"> = newTagFactory(
-  "colgroup"
-);
+export const colgroup: JsonHtmlTagFactory<"colgroup"> =
+  newTagFactory("colgroup");
 export const data: JsonHtmlTagFactory<"data"> = newTagFactory("data");
-export const datalist: JsonHtmlTagFactory<"datalist"> = newTagFactory(
-  "datalist"
-);
+export const datalist: JsonHtmlTagFactory<"datalist"> =
+  newTagFactory("datalist");
 export const dd: JsonHtmlTagFactory<"dd"> = newTagFactory("dd");
 export const del: JsonHtmlTagFactory<"del"> = newTagFactory("del");
 export const details: JsonHtmlTagFactory<"details"> = newTagFactory("details");
@@ -77,12 +75,10 @@ export const dl: JsonHtmlTagFactory<"dl"> = newTagFactory("dl");
 export const dt: JsonHtmlTagFactory<"dt"> = newTagFactory("dt");
 export const em: JsonHtmlTagFactory<"em"> = newTagFactory("em");
 export const embed: JsonHtmlTagFactory<"embed"> = newTagFactory("embed");
-export const fieldset: JsonHtmlTagFactory<"fieldset"> = newTagFactory(
-  "fieldset"
-);
-export const figcaption: JsonHtmlTagFactory<"figcaption"> = newTagFactory(
-  "figcaption"
-);
+export const fieldset: JsonHtmlTagFactory<"fieldset"> =
+  newTagFactory("fieldset");
+export const figcaption: JsonHtmlTagFactory<"figcaption"> =
+  newTagFactory("figcaption");
 export const figure: JsonHtmlTagFactory<"figure"> = newTagFactory("figure");
 export const font: JsonHtmlTagFactory<"font"> = newTagFactory("font");
 export const footer: JsonHtmlTagFactory<"footer"> = newTagFactory("footer");
@@ -113,23 +109,20 @@ export const mark: JsonHtmlTagFactory<"mark"> = newTagFactory("mark");
 export const meta: JsonHtmlTagFactory<"meta"> = newTagFactory("meta");
 export const meter: JsonHtmlTagFactory<"meter"> = newTagFactory("meter");
 export const nav: JsonHtmlTagFactory<"nav"> = newTagFactory("nav");
-export const noscript: JsonHtmlTagFactory<"noscript"> = newTagFactory(
-  "noscript"
-);
+export const noscript: JsonHtmlTagFactory<"noscript"> =
+  newTagFactory("noscript");
 export const object: JsonHtmlTagFactory<"object"> = newTagFactory("object");
 export const ol: JsonHtmlTagFactory<"ol"> = newTagFactory("ol");
-export const optgroup: JsonHtmlTagFactory<"optgroup"> = newTagFactory(
-  "optgroup"
-);
+export const optgroup: JsonHtmlTagFactory<"optgroup"> =
+  newTagFactory("optgroup");
 export const option: JsonHtmlTagFactory<"option"> = newTagFactory("option");
 export const output: JsonHtmlTagFactory<"output"> = newTagFactory("output");
 export const p: JsonHtmlTagFactory<"p"> = newTagFactory("p");
 export const param: JsonHtmlTagFactory<"param"> = newTagFactory("param");
 export const picture: JsonHtmlTagFactory<"picture"> = newTagFactory("picture");
 export const pre: JsonHtmlTagFactory<"pre"> = newTagFactory("pre");
-export const progress: JsonHtmlTagFactory<"progress"> = newTagFactory(
-  "progress"
-);
+export const progress: JsonHtmlTagFactory<"progress"> =
+  newTagFactory("progress");
 export const q: JsonHtmlTagFactory<"q"> = newTagFactory("q");
 export const rp: JsonHtmlTagFactory<"rp"> = newTagFactory("rp");
 export const rt: JsonHtmlTagFactory<"rt"> = newTagFactory("rt");
@@ -151,12 +144,10 @@ export const sup: JsonHtmlTagFactory<"sup"> = newTagFactory("sup");
 export const table: JsonHtmlTagFactory<"table"> = newTagFactory("table");
 export const tbody: JsonHtmlTagFactory<"tbody"> = newTagFactory("tbody");
 export const td: JsonHtmlTagFactory<"td"> = newTagFactory("td");
-export const template: JsonHtmlTagFactory<"template"> = newTagFactory(
-  "template"
-);
-export const textarea: JsonHtmlTagFactory<"textarea"> = newTagFactory(
-  "textarea"
-);
+export const template: JsonHtmlTagFactory<"template"> =
+  newTagFactory("template");
+export const textarea: JsonHtmlTagFactory<"textarea"> =
+  newTagFactory("textarea");
 export const tfoot: JsonHtmlTagFactory<"tfoot"> = newTagFactory("tfoot");
 export const th: JsonHtmlTagFactory<"th"> = newTagFactory("th");
 export const thead: JsonHtmlTagFactory<"thead"> = newTagFactory("thead");

@@ -13,17 +13,18 @@ const renderNode = (tag: string, attrs: Attributes, children: Node[]): Node => {
   for (const attrKey of Object.keys(attrs)) {
     const attrVal = attrs[attrKey];
     if (attrKey === "id") {
-      node.id = (attrVal as unknown) as string;
+      node.id = attrVal as unknown as string;
     } else if (attrKey === "class") {
-      for (const cls of ((attrVal as unknown) as string).split(" ")) {
+      for (const cls of (attrVal as unknown as string).split(" ")) {
         if (cls !== "") node.classList.add(cls);
       }
     } else if (typeof attrVal === "function") {
       const type = attrKey.substr(2).toLowerCase();
-      const listener = (attrVal as unknown) as (event: Event) => void;
+      const listener = attrVal as unknown as (event: Event) => void;
       node.addEventListener(type, (e: Event) => listener(e));
     } else if (attrKey === "style") {
-      const styles: CSSStyleDeclaration = (attrVal as unknown) as CSSStyleDeclaration;
+      const styles: CSSStyleDeclaration =
+        attrVal as unknown as CSSStyleDeclaration;
       for (const styleKey of Object.keys(styles)) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -40,7 +41,7 @@ const renderNode = (tag: string, attrs: Attributes, children: Node[]): Node => {
         node.removeAttribute(attrKey);
       }
     } else {
-      node.setAttribute(attrKey, (attrVal as unknown) as string);
+      node.setAttribute(attrKey, attrVal as unknown as string);
     }
   }
 
