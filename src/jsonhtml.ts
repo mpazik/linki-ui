@@ -29,6 +29,12 @@ const newTagFactory = <T extends HtmlTag>(tag: T): JsonHtmlTagFactory<T> => (
 
 // Custom tag
 export const dom = (element: Element): JsonHtml => ["dom", { element }];
+export const dangerousHtml = (html: string): JsonHtml => {
+  const parent = document.createElement("template");
+  parent.innerHTML = html;
+  const element = parent.content;
+  return ["dom", { element }];
+};
 
 // Standard tags
 export const a: JsonHtmlTagFactory<"a"> = newTagFactory("a");

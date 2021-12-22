@@ -1,5 +1,5 @@
 import type { JsonHtml } from "./jsonhtml";
-import { div, dom } from "./jsonhtml";
+import { dangerousHtml, div, dom } from "./jsonhtml";
 import { renderJsonHtmlToDom } from "./render";
 
 test.each<[string, JsonHtml, string]>([
@@ -65,6 +65,11 @@ test.each<[string, JsonHtml, string]>([
     "<div></div>",
   ],
   ["dom element", [dom(document.createElement("div"))], "<div></div>"],
+  [
+    "html",
+    [dangerousHtml("<div>Test<p>Hi</p></div>")],
+    "<div>Test<p>Hi</p></div>",
+  ],
 ])(`renderToDom should render %p`, (name, input, result) => {
   const parent = document.createElement("div");
   parent.appendChild(renderJsonHtmlToDom(input));
