@@ -28,12 +28,15 @@
   "scripts": {
     "build": "tsc",
     "lint": "yarn eslint . --ext .ts",
-    "test": "jest"
+    "test": "jest",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "linki": "^0.1.5"
   },
   "devDependencies": {
+    "@storybook/html": "^6.4.9",
     "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.3.0",
     "@typescript-eslint/parser": "^4.3.0",
@@ -47,6 +50,8 @@
     "eslint-plugin-unused-imports": "^1.1.1",
     "jest": "^27.4.5",
     "prettier": "^2.2.1",
+    "storybook": "^6.4.9",
+    "storybook-addon-turbo-build": "^1.0.1",
     "typescript": "^4.2.4"
   },
   "eslintIgnore": [
