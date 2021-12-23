@@ -1,6 +1,6 @@
 {
   "name": "linki-ui",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "linki dom render component and set of utilities to integrate with dom API",
   "keywords": [
     "front-end",
@@ -61,7 +61,9 @@
   "jest": {
     "testEnvironment": "jsdom",
     "transform": {
-      "^.+\\.(t|j)s$": ["esbuild-jest"]
+      "^.+\\.(t|j)s$": [
+        "esbuild-jest"
+      ]
     },
     "transformIgnorePatterns": [
       "/node_modules/(?!linki)"
