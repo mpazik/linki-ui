@@ -11,5 +11,5 @@ module.exports = {
       },
     },
   ],
-  "framework": "@storybook/html"
+  "framework": "linki-ui-storybook"
 }

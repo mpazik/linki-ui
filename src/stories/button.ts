@@ -1,7 +1,5 @@
-import type { Meta } from "@storybook/html";
-
+import type { JsonHtml } from "../jsonhtml";
 import { button } from "../jsonhtml";
-import { renderJsonHtmlToDom } from "../render";
 import type { View } from "../view";
 
 export interface ButtonProps {
@@ -17,7 +15,7 @@ const fontSizeMap = {
   large: "24px",
 };
 
-const createButton: View<ButtonProps> = ({
+const myButton: View<ButtonProps> = ({
   primary = false,
   size = "medium",
   label,
@@ -35,39 +33,29 @@ const createButton: View<ButtonProps> = ({
     label
   );
 
-const setup =
-  (props: Partial<ButtonProps>): (() => Node) =>
-  () =>
-    renderJsonHtmlToDom(
-      createButton({
-        primary: false,
-        label: "Default name",
-        onClick: () => console.log("default click"),
-        ...props,
-      })
-    );
+export default {};
 
-export default {
-  title: "Example/Button",
-} as Meta;
+export const primary = (): JsonHtml =>
+  myButton({
+    primary: true,
+    label: "Button",
+    onClick: () => console.log("custom"),
+  });
 
-export const Primary = setup({
-  primary: true,
-  label: "Button",
-  onClick: () => console.log("custom"),
-});
+export const secondary = (): JsonHtml =>
+  myButton({
+    label: "Button",
+    primary: false,
+  });
 
-export const Secondary = setup({
-  label: "Button",
-  primary: false,
-});
+export const large = (): JsonHtml =>
+  myButton({
+    label: "Button",
+    size: "large",
+  });
 
-export const Large = setup({
-  label: "Button",
-  size: "large",
-});
-
-export const Small = setup({
-  label: "Button",
-  size: "small",
-});
+export const small = (): JsonHtml =>
+  myButton({
+    label: "Button",
+    size: "small",
+  });
