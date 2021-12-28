@@ -1,62 +1,21 @@
-import type { Callback, Processor } from "linki";
-import { combine, link, map } from "linki";
+import { combine, link } from "linki";
+import { withKick } from "linki-experimental/dist/kick";
 
-import type { JsonHtml, View } from "../src";
-import { defineUiComponent, p } from "../src";
-import type { Attributes } from "../src/jsonml";
-
-const numberInput: View<
-  Attributes["input"] & {
-    value?: number | undefined;
-    onChange?: Callback<number> | undefined;
-    max?: number | undefined;
-    min?: number | undefined;
-  }
-> = (props) => [
-  "input",
-  {
-    ...props,
-    type: "number",
-    ...(props.value ? { value: props.value.toString() } : {}),
-    ...(props.min ? { min: props.min.toString() } : {}),
-    ...(props.max ? { value: props.max.toString() } : {}),
-    ...(props.onChange
-      ? {
-          onChange: (event: Event) => {
-            props.onChange(+(event.target as HTMLInputElement).value);
-          },
-        }
-      : {}),
-  },
-];
-
-const kick =
-  <C>(initState: C): Processor<C, C> =>
-  (callback) => {
-    callback(initState);
-    return callback;
-  };
-
-const sumComponent = defineUiComponent<
-  { initA: number; initB: number },
-  { updateA: number; updateB: number }
->((render, { initA, initB }) => {
-  const [updateA, updateB] = link(
-    combine(initA, initB),
-    kick([initA, initB]),
-    map(([a, b]) => p(`${a} + ${b} = ${a + b}`)),
-    render
-  );
-
-  return {
-    updateA,
-    updateB,
-  };
-});
+import type { JsonHtml } from "../src";
+import { dom, createViewRenderer, p } from "../src";
+import { numberInput } from "../src/helper-views";
 
 export default {};
 const summaryView = (initA: number, initB: number): JsonHtml => {
-  const [sum, { updateA, updateB }] = sumComponent({ initA, initB });
+  const [sumRoot, renderSum] = createViewRenderer(([a, b]: [number, number]) =>
+    p(`${a} + ${b} = ${a + b}`)
+  );
+
+  const [updateA, updateB] = link(
+    withKick((args) => combine(...args), [initA, initB]),
+    renderSum
+  );
+
   return [
     numberInput({
       value: initA,
@@ -66,7 +25,7 @@ const summaryView = (initA: number, initB: number): JsonHtml => {
       value: initB,
       onChange: (it) => updateB(it),
     }),
-    sum,
+    dom(sumRoot),
   ];
 };
 export const Default = (): JsonHtml => summaryView(1, 2);

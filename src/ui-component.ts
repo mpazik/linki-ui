@@ -3,10 +3,22 @@ import type { Callback, NamedCallbacks as OriginalNamedCallbacks } from "linki";
 import type { JsonHtml } from "./jsonhtml";
 import { dom } from "./jsonhtml";
 import { renderJsonHtmlToDom } from "./render";
+import type { View } from "./view";
 
 const componentClassName = "component";
+interface ComponentElementEventMap {
+  connected: Event;
+  disconnected: Event;
+}
+interface ComponentElement extends HTMLElement {
+  addEventListener<K extends keyof ComponentElementEventMap>(
+    type: K,
+    listener: (this: ComponentElement, ev: ComponentElementEventMap[K]) => void,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+}
 
-export type Render = Callback<JsonHtml | undefined>;
+export type Render = Callback<JsonHtml | void>;
 
 const findComponentNodes = (dom: Node): Element[] => {
   if (dom.nodeType === Node.ELEMENT_NODE) {
@@ -25,11 +37,11 @@ const findComponentNodes = (dom: Node): Element[] => {
   return [];
 };
 
-export const createRenderer = (parent: Element): Render => {
+export const createRendererForElement = (parent: Element): Render => {
   let existingComponents: Element[] = [];
 
   return (jsonHtml) => {
-    const dom = renderJsonHtmlToDom(jsonHtml);
+    const dom = renderJsonHtmlToDom(jsonHtml ?? undefined);
     const renderedComponents: Element[] = findComponentNodes(dom);
 
     existingComponents
@@ -51,6 +63,27 @@ export const createRenderer = (parent: Element): Render => {
   };
 };
 
+export const createComponentRenderer = (): [ComponentElement, Render] => {
+  const parent: HTMLElement = document.createElement("div");
+  parent.classList.add(componentClassName);
+  const render = createRendererForElement(parent);
+
+  return [parent, render];
+};
+
+export const createViewRenderer = <T>(
+  view: View<T>
+): [ComponentElement, Callback<T>] => {
+  const [parent, render] = createComponentRenderer();
+  return [
+    parent,
+    (props) => {
+      const jsonHtml = view(props);
+      return render(jsonHtml);
+    },
+  ];
+};
+
 export type NamedCallbacks<T extends object | void> = T extends object
   ? OriginalNamedCallbacks<T>
   : OriginalNamedCallbacks<{}>;
@@ -69,26 +102,17 @@ export const defineUiComponent =
       : void | { mounted?: Callback; willUnmount?: Callback }
   ): ElementComponent<T, S> =>
   (props) => {
-    const parent: HTMLElement = document.createElement("div");
-    parent.classList.add(componentClassName);
-
-    const renderer = createRenderer(parent);
-    const handlers = factory(renderer, props);
+    const [parent, render] = createComponentRenderer();
+    const handlers = factory(render, props);
     if (!handlers) {
       return [dom(parent), {} as NamedCallbacks<S>];
     }
 
-    const { mounted, willUnmount, ...restHandlers } =
-      handlers as NamedCallbacks<S> & {
-        mounted?: Callback;
-        willUnmount?: Callback;
-      };
-
-    if (mounted) {
-      parent.addEventListener("connected", () => mounted!());
+    if (handlers.mounted) {
+      parent.addEventListener("connected", () => handlers.mounted!());
     }
-    if (willUnmount) {
-      parent.addEventListener("disconnected", () => willUnmount!());
+    if (handlers.willUnmount) {
+      parent.addEventListener("disconnected", () => handlers.willUnmount!());
     }
-    return [dom(parent), restHandlers as unknown as NamedCallbacks<S>];
+    return [dom(parent), handlers as NamedCallbacks<S>];
   };
