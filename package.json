@@ -26,17 +26,19 @@
     "/dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
+    "prepack": "yarn build",
     "lint": "yarn eslint . --ext .ts",
     "test": "jest",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "linki": "^0.1.5"
+    "linki": "^0.1.7",
+    "linki-experimental": "^0.3.0"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
+    "@types/jest": "^27.0.3",
     "@typescript-eslint/eslint-plugin": "^4.3.0",
     "@typescript-eslint/parser": "^4.3.0",
     "esbuild": "^0.14.6",
@@ -49,10 +51,11 @@
     "eslint-plugin-unused-imports": "^1.1.1",
     "jest": "^27.4.5",
     "linki-ui-storybook": "^0.1.0",
-    "prettier": "^2.2.1",
+    "prettier": "^2.5.1",
     "storybook": "^6.4.9",
     "storybook-addon-turbo-build": "^1.0.1",
-    "typescript": "^4.2.4"
+    "ts-jest": "^27.1.2",
+    "typescript": "^4.5.4"
   },
   "eslintIgnore": [
     "node_modules",
@@ -60,13 +63,6 @@
   ],
   "jest": {
     "testEnvironment": "jsdom",
-    "transform": {
-      "^.+\\.(t|j)s$": [
-        "esbuild-jest"
-      ]
-    },
-    "transformIgnorePatterns": [
-      "/node_modules/(?!linki)"
-    ]
+    "preset": "ts-jest/presets/js-with-babel-esm"
   }
 }

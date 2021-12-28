@@ -2,7 +2,17 @@ import type { JsonHtml } from "./jsonhtml";
 import { mapJsonHtml } from "./jsonhtml";
 import type { Attributes } from "./jsonml";
 
-const expliciteBooleanAttributes = ["contenteditable", "draggable"];
+const explicitBooleanAttributes = ["contenteditable", "draggable"];
+
+export const classList = (classes: Record<string, boolean>): string =>
+  Object.keys(classes)
+    .reduce((selectedClsses, className) => {
+      if (classes[className]) {
+        selectedClsses.push(className);
+      }
+      return selectedClsses;
+    }, [] as string[])
+    .join(" ");
 
 const renderNode = (tag: string, attrs: Attributes, children: Node[]): Node => {
   if (tag === "dom") {
@@ -32,7 +42,7 @@ const renderNode = (tag: string, attrs: Attributes, children: Node[]): Node => {
       }
     } else if (typeof attrVal === "boolean") {
       if (attrVal) {
-        if (expliciteBooleanAttributes.includes(attrKey)) {
+        if (explicitBooleanAttributes.includes(attrKey)) {
           node.setAttribute(attrKey, "true");
         } else {
           node.setAttribute(attrKey, attrKey);

@@ -1,6 +1,5 @@
-import type { JsonHtml } from "../jsonhtml";
-import { button } from "../jsonhtml";
-import type { View } from "../view";
+import { button } from "../src";
+import type { JsonHtml, View } from "../src";
 
 export interface ButtonProps {
   primary?: boolean;
@@ -34,7 +33,6 @@ const myButton: View<ButtonProps> = ({
   );
 
 export default {};
-
 export const primary = (): JsonHtml =>
   myButton({
     primary: true,
