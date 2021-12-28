@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "linki": "^0.1.7",
-    "linki-experimental": "^0.3.0"
+    "linki-experimental": "^0.4.0"
   },
   "devDependencies": {
     "@types/jest": "^27.0.3",
