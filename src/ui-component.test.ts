@@ -2,7 +2,7 @@ import type { Callback } from "linki";
 
 import type { JsonHtml } from "./jsonhtml";
 import { div, span } from "./jsonhtml";
-import { createRendererForElement, defineUiComponent } from "./ui-component";
+import { createComponentRenderer, defineUiComponent } from "./ui-component";
 
 import Mock = jest.Mock;
 
@@ -28,7 +28,7 @@ const newPropComponent = (content?: JsonHtml): [JsonHtml, Mock, Mock] => {
 describe("children is detected as component when", () => {
   test("rendered directly", () => {
     const [component, connected] = newPropComponent();
-    const render = createRendererForElement(document.createElement("div"));
+    const [, render] = createComponentRenderer();
 
     render(component);
     expect(connected.mock.calls.length).toEqual(1);
@@ -36,7 +36,7 @@ describe("children is detected as component when", () => {
 
   test("rendered as dom fragment", () => {
     const [component, connected] = newPropComponent();
-    const render = createRendererForElement(document.createElement("div"));
+    const [, render] = createComponentRenderer();
 
     render([component, div()]);
     expect(connected.mock.calls.length).toEqual(1);
@@ -44,7 +44,7 @@ describe("children is detected as component when", () => {
 
   test("rendered in nested dom", () => {
     const [component, connected] = newPropComponent();
-    const render = createRendererForElement(document.createElement("div"));
+    const [, render] = createComponentRenderer();
 
     render(div(component));
     expect(connected.mock.calls.length).toEqual(1);
@@ -53,7 +53,7 @@ describe("children is detected as component when", () => {
   test("rendered in nested component", () => {
     const [child, connected] = newPropComponent();
     const [component] = newPropComponent(child);
-    const render = createRendererForElement(document.createElement("div"));
+    const [, render] = createComponentRenderer();
 
     render(div(component));
     expect(connected.mock.calls.length).toEqual(1);
@@ -62,7 +62,7 @@ describe("children is detected as component when", () => {
   test("rendered in nested component as a fragment", () => {
     const [child, connected] = newPropComponent();
     const [component] = newPropComponent(child);
-    const render = createRendererForElement(document.createElement("div"));
+    const [, render] = createComponentRenderer();
 
     render([component, span("test")]);
     expect(connected.mock.calls.length).toEqual(1);
@@ -71,7 +71,7 @@ describe("children is detected as component when", () => {
 
 test("children is not disconnected when is re-rendered", () => {
   const [component, connected] = newPropComponent();
-  const render = createRendererForElement(document.createElement("div"));
+  const [, render] = createComponentRenderer();
 
   render(div(component));
   expect(connected.mock.calls.length).toEqual(1);
@@ -82,7 +82,7 @@ test("children is not disconnected when is re-rendered", () => {
 
 test("children is not disconnected after is removed", () => {
   const [component, , disconnected] = newPropComponent();
-  const render = createRendererForElement(document.createElement("div"));
+  const [, render] = createComponentRenderer();
 
   render(component);
   render();
@@ -92,7 +92,7 @@ test("children is not disconnected after is removed", () => {
 
 test("children is not re-connected when is re-rendered after removal", () => {
   const [component, connected] = newPropComponent();
-  const render = createRendererForElement(document.createElement("div"));
+  const [, render] = createComponentRenderer();
 
   render(component);
   render();
@@ -101,13 +101,27 @@ test("children is not re-connected when is re-rendered after removal", () => {
   expect(connected.mock.calls.length).toEqual(2);
 });
 
-test("content of nested component is preserved when component is moved around", () => {
+test("content of component is preserved when component is moved around", () => {
   const [component] = newPropComponent("my-component");
-  const parent = document.createElement("div");
-  const render = createRendererForElement(parent);
+  const [parent, render] = createComponentRenderer();
 
   render(component);
   render(div(component));
   render([div(), div(component)]);
   expect(parent.innerHTML).toContain("my-component");
+});
+
+test("nested children are connected and disconnected", () => {
+  const [grandChild, connected, disconnected] = newPropComponent();
+  const [child] = newPropComponent(grandChild);
+  const [component] = newPropComponent(child);
+  const [, render] = createComponentRenderer();
+
+  render(component);
+  expect(connected.mock.calls.length).toEqual(1);
+  expect(disconnected.mock.calls.length).toEqual(0);
+
+  render();
+  expect(connected.mock.calls.length).toEqual(1);
+  expect(disconnected.mock.calls.length).toEqual(1);
 });

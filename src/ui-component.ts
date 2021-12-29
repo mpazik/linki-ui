@@ -5,7 +5,6 @@ import { dom } from "./jsonhtml";
 import { renderJsonHtmlToDom } from "./render";
 import type { View } from "./view";
 
-const componentClassName = "component";
 interface ComponentElementEventMap {
   connected: Event;
   disconnected: Event;
@@ -20,6 +19,7 @@ interface ComponentElement extends HTMLElement {
 
 export type Render = Callback<JsonHtml | void>;
 
+const componentClassName = "component";
 const findComponentNodes = (dom: Node): Element[] => {
   if (dom.nodeType === Node.ELEMENT_NODE) {
     if ((dom as HTMLElement).classList.contains(componentClassName)) {
@@ -37,17 +37,24 @@ const findComponentNodes = (dom: Node): Element[] => {
   return [];
 };
 
-export const createRendererForElement = (parent: Element): Render => {
-  let existingComponents: Element[] = [];
+export const createComponentRenderer = (): [ComponentElement, Render] => {
+  const parent: HTMLElement = document.createElement("div");
+  parent.classList.add(componentClassName);
+  parent.addEventListener("disconnected", () => {
+    existingComponents.forEach((existingComponent) => {
+      existingComponent.dispatchEvent(new CustomEvent("disconnected"));
+    });
+  });
 
-  return (jsonHtml) => {
+  let existingComponents: Element[] = [];
+  const render: Render = (jsonHtml) => {
     const dom = renderJsonHtmlToDom(jsonHtml ?? undefined);
     const renderedComponents: Element[] = findComponentNodes(dom);
 
     existingComponents
       .filter((it) => renderedComponents.indexOf(it) < 0)
-      .forEach((oldComponent) => {
-        oldComponent.dispatchEvent(new CustomEvent("disconnected"));
+      .forEach((existingComponent) => {
+        existingComponent.dispatchEvent(new CustomEvent("disconnected"));
       });
 
     parent.innerHTML = "";
@@ -61,12 +68,6 @@ export const createRendererForElement = (parent: Element): Render => {
 
     existingComponents = renderedComponents;
   };
-};
-
-export const createComponentRenderer = (): [ComponentElement, Render] => {
-  const parent: HTMLElement = document.createElement("div");
-  parent.classList.add(componentClassName);
-  const render = createRendererForElement(parent);
 
   return [parent, render];
 };
