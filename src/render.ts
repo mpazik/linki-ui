@@ -16,7 +16,7 @@ export const classList = (classes: Record<string, boolean>): string =>
 
 const renderNode = (tag: string, attrs: Attributes, children: Node[]): Node => {
   if (tag === "dom") {
-    return attrs["element"] as Element;
+    return attrs["element"] as Node;
   }
   const node = document.createElement(tag);
 

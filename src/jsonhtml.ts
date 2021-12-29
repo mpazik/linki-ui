@@ -29,7 +29,7 @@ const newTagFactory =
     [tag, ...props] as JsonHtml;
 
 // Custom tag
-export const dom = (element: Element): JsonHtml => ["dom", { element }];
+export const dom = (element: Node): JsonHtml => ["dom", { element }];
 export const dangerousHtml = (html: string): JsonHtml => {
   const parent = document.createElement("template");
   parent.innerHTML = html;
