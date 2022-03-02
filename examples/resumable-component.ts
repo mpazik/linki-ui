@@ -1,9 +1,8 @@
 import type { Callback, ClosableProvider, Close } from "linki";
-import { count, link, map, pipe, reduce, wrap } from "linki";
-import { withKick } from "linki-experimental/dist/kick";
+import { count, link, map, pipe, reduce, wrap, kick } from "linki";
 
-import type { ElementComponent, JsonHtml, View } from "../src";
-import { button, defineUiComponent, div, span, setupView } from "../src";
+import type { JsonHtml, UiComponent, View } from "../src";
+import { button, div, span, setupView, mountComponent } from "../src";
 
 const periodicProvider =
   (start: number): ClosableProvider<number> =>
@@ -29,8 +28,9 @@ const timerView: View<{ n: number }> = ({ n }) => {
   return div(`time:${n}`);
 };
 
-const timer: ElementComponent<{ init: number }, { restart: number }> =
-  defineUiComponent((render, { init }) => {
+const timer =
+  (init: number): UiComponent<{ restart: number }> =>
+  ({ render }) => {
     let stopProvider: Close | undefined;
 
     const startTimer = (seconds: number) => {
@@ -42,8 +42,8 @@ const timer: ElementComponent<{ init: number }, { restart: number }> =
     };
 
     return {
-      mounted: () => startTimer(init),
-      willUnmount: () => {
+      start: () => startTimer(init),
+      stop: () => {
         if (stopProvider) {
           stopProvider();
           stopProvider = undefined;
@@ -51,10 +51,9 @@ const timer: ElementComponent<{ init: number }, { restart: number }> =
       },
       restart: startTimer,
     };
-  });
+  };
 
 const mainView: View<{
-  init: string;
   bottomSlot: JsonHtml;
   onClick: () => void;
   onClickTrigger: () => void;
@@ -70,26 +69,27 @@ const mainView: View<{
     ...(num % 2 === 0 ? [bottomSlot] : [])
   );
 
-const main = defineUiComponent((render) => {
+const main: UiComponent = ({ render }) => {
   const initNumber = 10;
 
-  const [timerRoot, { restart: startTimer }] = timer({ init: 3 });
+  const [timerRoot, { restart: startTimer }] = mountComponent(timer(3));
+
   const setupMainView: View<{ num: number }> = setupView(mainView, {
-    init: "test",
     bottomSlot: timerRoot,
     onClick: () => increaseState(),
     onClickTrigger: () => startTimer(Math.floor(Math.random() * 10)),
   });
 
   const increaseState: Callback = link(
-    withKick((init) => reduce(count, init), initNumber),
+    reduce(count, initNumber),
+    kick(initNumber),
     map(pipe(wrap("num")), setupMainView),
     render
   );
-});
+};
 
 export default {};
 export const Default = (): JsonHtml => {
-  const [root] = main();
+  const [root] = mountComponent(main);
   return root;
 };

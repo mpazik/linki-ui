@@ -7877,6 +7877,11 @@ linki-ui@^0.0.5:
   dependencies:
     linki "^0.1.5"
 
+linki@^0.1.10:
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/linki/-/linki-0.1.10.tgz#e6b07317bc5a4e60d56f8a00860a307790c0f043"
+  integrity sha512-KAr9Jlyh+56BjIuhanxqs+3sf3kB/9rJ2kysoYYJeYa6UBRnyrzKfHkbCPp784rEwdOPSkcfz2nijJu199237g==
+
 linki@^0.1.2:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/linki/-/linki-0.1.6.tgz#e7ff212ed6f508cea3e6f7d4700bf71ce2163284"
@@ -7886,11 +7891,6 @@ linki@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/linki/-/linki-0.1.5.tgz#4292036413045e6437da68fb37672577a0f80a86"
   integrity sha512-QJryIjpjxTIHrUXcI8RyBHy3NikzPei5r3dfhuIiP/DoK8EC9UOxmKdTQMkpoUbF+OEQSU64JiXoxTniQliKnw==
-
-linki@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/linki/-/linki-0.1.7.tgz#41877ba377b88480889e181595750d93caf0e3f8"
-  integrity sha512-rAIbEO+gIyzFTjfEh9qi1D9h0ffp4NN+kUdpNY/qCxVuBRnkt31C8fLBEt8vufv6eC3w8CxMMNWjBKzVovFxAQ==
 
 load-json-file@^1.0.0:
   version "1.1.0"

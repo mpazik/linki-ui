@@ -1,9 +1,9 @@
-import type { Callback, NamedCallbacks as NamedCallbacks } from "linki";
+import type { Callback, NamedCallbacks } from "linki";
 
+import type { ComponentIO, RelaxedComponent } from "./components-extra";
 import type { JsonHtml } from "./jsonhtml";
 import { dom } from "./jsonhtml";
 import { renderJsonHtmlToDom } from "./render";
-import type { View } from "./view";
 
 interface ComponentElementEventMap {
   connected: Event;
@@ -17,10 +17,10 @@ interface ComponentElement extends HTMLElement {
   ): void;
 }
 
-export type Render = Callback<JsonHtml>;
-export const createPureRenderer = (root: ParentNode): Render => {
+export type Render = Callback<JsonHtml | void>;
+export const createRenderer = (root: ParentNode): Render => {
   return (jsonHtml) => {
-    const dom = renderJsonHtmlToDom(jsonHtml);
+    const dom = renderJsonHtmlToDom(jsonHtml ?? undefined);
     root.replaceChildren(dom);
   };
 };
@@ -33,7 +33,7 @@ export const createPureRenderer = (root: ParentNode): Render => {
  */
 export const createRenderingBoundary = (): [JsonHtml, Render] => {
   const fragment = document.createDocumentFragment();
-  const renderer = createPureRenderer(fragment);
+  const renderer = createRenderer(fragment);
   return [dom(fragment), renderer];
 };
 
@@ -55,8 +55,7 @@ const findComponentNodes = (dom: Node): Element[] => {
   return [];
 };
 
-export const createComponentRenderer = (): [ComponentElement, Render] => {
-  const parent: HTMLElement = document.createElement("div");
+export const createComponentRenderer = (parent: HTMLElement): Render => {
   parent.classList.add(componentClassName);
   parent.addEventListener("disconnected", () => {
     existingComponents.forEach((existingComponent) => {
@@ -65,7 +64,8 @@ export const createComponentRenderer = (): [ComponentElement, Render] => {
   });
 
   let existingComponents: Element[] = [];
-  const render: Render = (jsonHtml) => {
+
+  return (jsonHtml) => {
     const dom = renderJsonHtmlToDom(jsonHtml ?? undefined);
     const renderedComponents: Element[] = findComponentNodes(dom);
 
@@ -85,21 +85,6 @@ export const createComponentRenderer = (): [ComponentElement, Render] => {
 
     existingComponents = renderedComponents;
   };
-
-  return [parent, render];
-};
-
-export const createViewRenderer = <T>(
-  view: View<T>
-): [ComponentElement, Callback<T>] => {
-  const [parent, render] = createComponentRenderer();
-  return [
-    parent,
-    (props) => {
-      const jsonHtml = view(props);
-      return render(jsonHtml);
-    },
-  ];
 };
 
 export type RelaxedNamedCallbacks<T extends object | void> = NamedCallbacks<
@@ -110,71 +95,30 @@ export type ElementComponent<T = void, S extends object | void = void> = (
   props: T
 ) => [JsonHtml, RelaxedNamedCallbacks<S>];
 
-export const defineUiComponent =
-  <T = void, S extends object | void = void>(
-    factory: (
-      render: Render,
-      props: T
-    ) => S extends object
-      ? RelaxedNamedCallbacks<S> & {
-          mounted?: Callback;
-          willUnmount?: Callback;
-        }
-      : void | { mounted?: Callback; willUnmount?: Callback }
-  ): ElementComponent<T, S> =>
-  (props) => {
-    const [parent, render] = createComponentRenderer();
-    const handlers = factory(render, props);
-    if (!handlers) {
-      return [dom(parent), {} as RelaxedNamedCallbacks<S>];
-    }
-
-    if (handlers.mounted) {
-      parent.addEventListener("connected", () => handlers.mounted!());
-    }
-    if (handlers.willUnmount) {
-      parent.addEventListener("disconnected", () => handlers.willUnmount!());
-    }
-    return [dom(parent), handlers as RelaxedNamedCallbacks<S>];
-  };
-
-type ComponentInput<S extends object | void> = S extends object
-  ? NamedCallbacks<S>
-  : void;
-type ComponentOutput<T extends object | void> = T extends object
-  ? NamedCallbacks<T>
-  : void;
-
-export type RelaxedComponent<
-  T extends object | void = void,
-  S extends object | void = void
-> = (props: ComponentInput<S>) => ComponentOutput<T>;
-
 export type UiComponent<
-  T extends object | void = void,
-  S extends object | void = void
+  I extends object | void = void,
+  O extends object | void = void
 > = RelaxedComponent<
-  T extends object ? T & { start?: void; stop?: void } : void,
-  S extends object ? S & { render: JsonHtml } : { render: JsonHtml }
+  I extends object ? I & { start?: void; stop?: void } : void,
+  O extends object ? O & { render: JsonHtml } : { render: JsonHtml }
 >;
 
-export type PureUiComponent = UiComponent;
-
 export const mountComponent = <
-  T extends object | void,
-  S extends object | void
+  I extends object | void,
+  O extends object | void
 >(
-  ...[component, props]: S extends object
-    ? [UiComponent<T, S>, ComponentInput<S>]
-    : [UiComponent<T, S>]
-): [JsonHtml, ComponentOutput<T>] => {
-  const [parent, render] = createComponentRenderer();
+  ...[component, props]: O extends object
+    ? [UiComponent<I, O>, ComponentIO<O>]
+    : [UiComponent<I, O>]
+): [JsonHtml, ComponentIO<I>] => {
+  const parent = document.createElement("div");
+  const render = createComponentRenderer(parent);
   const handlers = component(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     props ? { ...(props as any), render } : { render }
   );
   if (!handlers) {
-    return [dom(parent), {} as T extends object ? NamedCallbacks<T> : void];
+    return [dom(parent), {} as I extends object ? NamedCallbacks<I> : void];
   }
 
   if (handlers.start) {
@@ -186,6 +130,6 @@ export const mountComponent = <
 
   return [
     dom(parent),
-    handlers as unknown as T extends object ? NamedCallbacks<T> : void,
+    handlers as unknown as I extends object ? NamedCallbacks<I> : void,
   ];
 };

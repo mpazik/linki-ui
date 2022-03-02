@@ -1,22 +1,24 @@
-import { link, map } from "linki";
+import { kick, link, map } from "linki";
 
 import type { ElementComponent, JsonHtml, View } from "..";
-import { button, defineUiComponent, div, h3, span } from "..";
+import { button, div, h3, span } from "..";
+import type { UiComponent } from "../src";
+import { mountComponent } from "../src";
 
 const supComponentView: View<string> = (param) =>
   div(h3("sub-component"), span(`Value: ${param}`));
 
-const subComponent: ElementComponent<
-  { param: string },
-  { updateParam: string }
-> = defineUiComponent((render, { param }) => {
-  const renderValue = link(map(supComponentView), render);
+const subComponent: UiComponent<{ updateParam: string }> = ({ render }) => {
+  const renderValue = link(
+    kick("Initial value"),
+    map(supComponentView),
+    render
+  );
 
-  renderValue(param);
   return {
     updateParam: renderValue,
   };
-});
+};
 
 const mainView: View<{
   init: string;
@@ -32,9 +34,7 @@ const mainView: View<{
   );
 
 const main: ElementComponent = () => {
-  const [bottomSlot, { updateParam }] = subComponent({
-    param: "custom param",
-  });
+  const [bottomSlot, { updateParam }] = mountComponent(subComponent);
 
   return [
     mainView({

@@ -34,7 +34,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "linki": "^0.1.7",
+    "linki": "^0.1.10",
     "linki-experimental": "^0.4.0"
   },
   "devDependencies": {
