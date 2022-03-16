@@ -123,7 +123,7 @@ interface ElementEventHandlers {
 interface DocumentAndElementEventHandlersEventHandlers {
   onCopy?: ClipboardEventHandler | undefined;
   onCut?: ClipboardEventHandler | undefined;
-  onCaste?: ClipboardEventHandler | undefined;
+  onPaste?: ClipboardEventHandler | undefined;
 }
 
 interface HTMLMediaElementEventHandlers {
