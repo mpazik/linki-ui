@@ -1,5 +1,5 @@
 import type { HTMLElementsAttributes } from "./html-types";
-import type { DirtyJsonMl } from "./jsonml";
+import type { DirtyJsonMl, DirtyJsonMlNode } from "./jsonml";
 import { mapDirtyJsonMl } from "./jsonml";
 
 type CustomElementsAttributes = {
@@ -11,6 +11,7 @@ type CustomElementsAttributes = {
 type Attributes = HTMLElementsAttributes & CustomElementsAttributes;
 type HtmlTag = keyof Attributes;
 
+export type JsonHtmlNode = DirtyJsonMlNode;
 export type JsonHtml = DirtyJsonMl;
 
 export const mapJsonHtml = mapDirtyJsonMl;
@@ -21,21 +22,25 @@ type TagProps<T extends HtmlTag = HtmlTag> =
 
 type JsonHtmlTagFactory<T extends HtmlTag> = (
   ...props: TagProps<T>
-) => JsonHtml;
+) => JsonHtmlNode;
 
 const newTagFactory =
   <T extends HtmlTag>(tag: T): JsonHtmlTagFactory<T> =>
-  (...props: [Attributes[T], ...JsonHtml[]] | [...JsonHtml[]]): JsonHtml =>
-    [tag, ...props] as JsonHtml;
+  (...props: [Attributes[T], ...JsonHtml[]] | [...JsonHtml[]]): JsonHtmlNode =>
+    [tag, ...props] as JsonHtmlNode;
 
 // Custom tag
-export const dom = (element: Node): JsonHtml => ["dom", { element }];
+export const dom = (element: Node): JsonHtmlNode => ["dom", { element }];
 export const dangerousHtml = (html: string): JsonHtml => {
   const parent = document.createElement("template");
   parent.innerHTML = html;
   const element = parent.content;
   return ["dom", { element }];
 };
+export const fragment = (...childrent: JsonHtml[]): JsonHtmlNode => [
+  "fragment",
+  ...childrent,
+];
 
 // Standard tags
 export const a: JsonHtmlTagFactory<"a"> = newTagFactory("a");

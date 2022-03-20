@@ -1,7 +1,7 @@
 import type { Callback, NamedCallbacks } from "linki";
 
 import type { ComponentIO, RelaxedComponent } from "./components-extra";
-import type { JsonHtml } from "./jsonhtml";
+import type { JsonHtml, JsonHtmlNode } from "./jsonhtml";
 import { dom } from "./jsonhtml";
 import { renderJsonHtmlToDom } from "./render";
 
@@ -110,7 +110,7 @@ export const mountComponent = <
   ...[component, props]: O extends object
     ? [UiComponent<I, O>, ComponentIO<O>]
     : [UiComponent<I, O>]
-): [JsonHtml, ComponentIO<I>] => {
+): [JsonHtmlNode, ComponentIO<I>] => {
   const parent = document.createElement("div");
   const render = createComponentRenderer(parent);
   const handlers = component(

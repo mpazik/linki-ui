@@ -17,6 +17,10 @@ export const classList = (classes: Record<string, boolean>): string =>
 const renderNode = (tag: string, attrs: Attributes, children: Node[]): Node => {
   if (tag === "dom") {
     return attrs["element"] as Node;
+  } else if (tag === "fragment") {
+    const fragment = document.createDocumentFragment();
+    children.forEach((child) => fragment.appendChild(child));
+    return fragment;
   }
   const node = document.createElement(tag);
 

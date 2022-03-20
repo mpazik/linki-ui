@@ -42,10 +42,12 @@ export const mapJsonMl = <T>(
   ]);
 };
 
-export type DirtyJsonMl =
+export type DirtyJsonMlNode =
   | [Tag, Attributes, ...DirtyJsonMl[]]
-  | [Tag, ...DirtyJsonMl[]]
-  | DirtyJsonMl[]
+  | [Tag, ...DirtyJsonMl[]];
+export type DirtyJsonMl =
+  | DirtyJsonMlNode
+  | DirtyJsonMlNode[]
   | undefined
   | string;
 

@@ -2,14 +2,14 @@ import type { DirtyJsonMl, JsonMl, Attributes, Tag } from "./jsonml";
 import { mapDirtyJsonMl, mapJsonMl, normaliseJsonMl } from "./jsonml";
 
 test("mapJsonMl", () => {
-  const input: JsonMl = ["test", { value: 5 }, ["me"]];
+  const input: JsonMl = ["tag", { value: 5 }, ["tag2"]];
   const result = mapJsonMl(
     input,
     (it) => [it],
     ([tag, , kids]) => [tag, ...kids.flat()]
   );
 
-  expect(result).toEqual(["test", "me"]);
+  expect(result).toEqual(["tag", "tag2"]);
 });
 
 describe("normaliseJsonMl", () => {
@@ -22,21 +22,21 @@ describe("normaliseJsonMl", () => {
       expect(normaliseJsonMl(input)).toEqual(expected);
     };
 
-  test("empty node", check(["test"], ["test", {}, []]));
+  test("empty node", check(["tag"], ["tag", {}, []]));
   test(
     "node with attribute",
-    check(["test", { attr: 5 }], ["test", { attr: 5 }, []])
+    check(["tag", { attr: 5 }], ["tag", { attr: 5 }, []])
   );
-  test("node with child", check(["test", ["kid"]], ["test", {}, [["kid"]]]));
+  test("node with child", check(["tag", ["kid"]], ["tag", {}, [["kid"]]]));
   test(
     "node with attribiute and child",
-    check(["test", { attr: 5 }, ["kid"]], ["test", { attr: 5 }, [["kid"]]])
+    check(["tag", { attr: 5 }, ["kid"]], ["tag", { attr: 5 }, [["kid"]]])
   );
 });
 
 describe("mapDirtyJsonMl", () => {
   type MappedType = string[];
-  const onString = (it: string): MappedType => [it];
+  const onString = (it: string): MappedType => ["s-" + it];
   const flattenKids = ([tag, , kids]: [
     Tag,
     Attributes,
@@ -48,13 +48,18 @@ describe("mapDirtyJsonMl", () => {
 
   test(
     "regular element",
-    check(["test", { value: 5 }, ["me"]], [["test", "me"]])
+    check(["tag", { value: 5 }, ["me"]], [["tag", "me"]])
+  );
+  test(
+    "element with flat children",
+    check(["tag", "text"], [["tag", "s-text"]])
   );
   test("undefined", check(undefined, []));
+  test("string", check("text", [["s-text"]]));
   test("empty array", check([], []));
-  test("array of elements", check([["test"], ["test"]], [["test"], ["test"]]));
+  test("array of elements", check([["tag1"], ["tag2"]], [["tag1"], ["tag2"]]));
   test(
     "undefined children",
-    check(["test", { value: 5 }, [], ["me"], undefined], [["test", "me"]])
+    check(["tag", { value: 5 }, [], ["me"], undefined], [["tag", "me"]])
   );
 });

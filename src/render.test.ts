@@ -1,11 +1,12 @@
 import type { JsonHtml } from "./jsonhtml";
-import { dangerousHtml, div, dom } from "./jsonhtml";
+import { dangerousHtml, div, dom, fragment } from "./jsonhtml";
 import { renderJsonHtmlToDom } from "./render";
 
 describe("renderToDom should render", () => {
   const check = (input: JsonHtml, result: string) => () => {
     const parent = document.createElement("div");
     parent.appendChild(renderJsonHtmlToDom(input));
+    renderJsonHtmlToDom(undefined);
     expect(parent.innerHTML).toEqual(result);
   };
 
@@ -42,7 +43,15 @@ describe("renderToDom should render", () => {
     "array of elements",
     check([div("node"), div("sibling")], "<div>node</div><div>sibling</div>")
   );
-  test("unwrapped single element", check([div("node")], "<div>node</div>"));
+  test(
+    "array of elements of string is interpreted as tag and its children",
+    check(["tag", "text", div("sibling")], "<tag>text<div>sibling</div></tag>")
+  ); // it is not necessarily a desirable behaviour, the way only way to fix it would be change the node representation from array to an object or forbit passing arrays as an argument
+  test(
+    "array of strings can be rendered when wrapped with fragment",
+    check(fragment("text1", "text2"), "text1text2")
+  );
+  test("array of single element", check([div("node")], "<div>node</div>"));
   test(
     "style",
     check(
@@ -52,30 +61,24 @@ describe("renderToDom should render", () => {
   );
   test(
     "element with boolean attribute",
-    check([div({ hidden: true })], '<div hidden="hidden"></div>')
+    check(div({ hidden: true }), '<div hidden="hidden"></div>')
   );
   test(
     "element with boolean attribute set to false",
-    check([div({ hidden: false })], "<div></div>")
+    check(div({ hidden: false }), "<div></div>")
   );
   test(
     "element with explicit boolean attribute",
-    check([div({ draggable: true })], '<div draggable="true"></div>')
+    check(div({ draggable: true }), '<div draggable="true"></div>')
   );
   test(
     "element with explicit boolean attribute set to false",
-    check([div({ draggable: false })], "<div></div>")
+    check(div({ draggable: false }), "<div></div>")
   );
-  test(
-    "dom element",
-    check([dom(document.createElement("div"))], "<div></div>")
-  );
+  test("dom element", check(dom(document.createElement("div")), "<div></div>"));
   test(
     "html",
-    check(
-      [dangerousHtml("<div>Test<p>Hi</p></div>")],
-      "<div>Test<p>Hi</p></div>"
-    )
+    check(dangerousHtml("<div>Test<p>Hi</p></div>"), "<div>Test<p>Hi</p></div>")
   );
   test("event handler", () => {
     const callback = jest.fn();

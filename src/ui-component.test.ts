@@ -1,6 +1,6 @@
 import type { Callback } from "linki";
 
-import type { JsonHtml } from "./jsonhtml";
+import type { JsonHtml, JsonHtmlNode } from "./jsonhtml";
 import { div, span } from "./jsonhtml";
 import type { UiComponent } from "./ui-component";
 import { createComponentRenderer, mountComponent } from "./ui-component";
@@ -21,7 +21,7 @@ const setupProbeComponent =
     };
   };
 
-const newPropComponent = (content?: JsonHtml): [JsonHtml, Mock, Mock] => {
+const newPropComponent = (content?: JsonHtml): [JsonHtmlNode, Mock, Mock] => {
   const connected = jest.fn();
   const disconnected = jest.fn();
   const [child] = mountComponent(
