@@ -28,7 +28,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "prepack": "yarn build",
-    "lint": "yarn eslint . --ext .ts",
+    "lint": "yarn eslint . --ext .ts && tsc --noEmit",
     "test": "jest",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
