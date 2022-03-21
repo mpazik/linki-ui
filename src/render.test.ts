@@ -1,3 +1,5 @@
+import { newProbe } from "linki";
+
 import type { JsonHtml } from "./jsonhtml";
 import { dangerousHtml, div, dom, fragment } from "./jsonhtml";
 import { renderJsonHtmlToDom } from "./render";
@@ -81,9 +83,9 @@ describe("renderToDom should render", () => {
     check(dangerousHtml("<div>Test<p>Hi</p></div>"), "<div>Test<p>Hi</p></div>")
   );
   test("event handler", () => {
-    const callback = jest.fn();
+    const [callback, getCalls] = newProbe<MouseEvent>();
     const result = renderJsonHtmlToDom(div({ onClick: callback }));
     (result as HTMLElement).click();
-    expect(callback.mock.calls.length).toEqual(1);
+    expect(getCalls().length).toEqual(1);
   });
 });

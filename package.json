@@ -30,7 +30,7 @@
     "build": "rm -rf dist && tsc",
     "prepack": "yarn build",
     "lint": "yarn eslint . --ext .ts && tsc --noEmit",
-    "test": "jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -49,7 +49,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-unused-imports": "^1.1.1",
-    "jest": "^27.4.5",
+    "jest": "^27.5.1",
     "linki-ui-storybook": "^0.1.0",
     "prettier": "^2.6.0",
     "storybook": "^6.4.9",
@@ -63,6 +63,15 @@
   ],
   "jest": {
     "testEnvironment": "jsdom",
-    "preset": "ts-jest/presets/js-with-babel-esm"
+    "preset": "ts-jest/presets/js-with-babel-esm",
+    "extensionsToTreatAsEsm": [".ts"],
+    "globals": {
+      "ts-jest": {
+        "useESM": true
+      }
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    }
   }
 }
