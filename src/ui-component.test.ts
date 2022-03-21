@@ -37,7 +37,7 @@ describe("children is detected as component when", () => {
     const render = createComponentRenderer(document.createElement("div"));
 
     render(component);
-    expect(getConnected().length).toEqual(1);
+    expect(getConnected()).toHaveLength(1);
   });
 
   test("rendered as dom fragment", () => {
@@ -45,7 +45,7 @@ describe("children is detected as component when", () => {
     const render = createComponentRenderer(document.createElement("div"));
 
     render([component, div()]);
-    expect(getConnected().length).toEqual(1);
+    expect(getConnected()).toHaveLength(1);
   });
 
   test("rendered in nested dom", () => {
@@ -53,7 +53,7 @@ describe("children is detected as component when", () => {
     const render = createComponentRenderer(document.createElement("div"));
 
     render(div(component));
-    expect(getConnected().length).toEqual(1);
+    expect(getConnected()).toHaveLength(1);
   });
 
   test("rendered in nested component", () => {
@@ -62,7 +62,7 @@ describe("children is detected as component when", () => {
     const render = createComponentRenderer(document.createElement("div"));
 
     render(div(component));
-    expect(getConnected().length).toEqual(1);
+    expect(getConnected()).toHaveLength(1);
   });
 
   test("rendered in nested component as a fragment", () => {
@@ -71,32 +71,32 @@ describe("children is detected as component when", () => {
     const render = createComponentRenderer(document.createElement("div"));
 
     render([component, span("test")]);
-    expect(getConnected().length).toEqual(1);
+    expect(getConnected()).toHaveLength(1);
   });
 });
 
-test("children is not disconnected when is re-rendered", () => {
-  const [component, getConnected] = newPropComponent();
-  const render = createComponentRenderer(document.createElement("div"));
-
-  render(div(component));
-  expect(getConnected().length).toEqual(1);
-
-  render([span("test"), div(div(component))]);
-  expect(getConnected().length).toEqual(0);
-});
-
-test("children is not disconnected after is removed", () => {
+test("children is disconnected after is removed", () => {
   const [component, , getDisconnected] = newPropComponent();
   const render = createComponentRenderer(document.createElement("div"));
 
   render(component);
   render();
 
-  expect(getDisconnected().length).toEqual(1);
+  expect(getDisconnected()).toHaveLength(1);
 });
 
-test("children is not re-connected when is re-rendered after removal", () => {
+test("children is not reconnected when is re-rendered", () => {
+  const [component, getConnected] = newPropComponent();
+  const render = createComponentRenderer(document.createElement("div"));
+
+  render(div(component));
+  expect(getConnected()).toHaveLength(1);
+
+  render([span("test"), div(div(component))]);
+  expect(getConnected()).toHaveLength(0);
+});
+
+test("children is reconnected when is re-rendered after removal", () => {
   const [component, getConnected] = newPropComponent();
   const render = createComponentRenderer(document.createElement("div"));
 
@@ -104,7 +104,7 @@ test("children is not re-connected when is re-rendered after removal", () => {
   render();
   render(component);
 
-  expect(getConnected().length).toEqual(2);
+  expect(getConnected()).toHaveLength(2);
 });
 
 test("content of component is preserved when component is moved around", () => {
@@ -125,10 +125,10 @@ test("nested children are connected and disconnected", () => {
   const render = createComponentRenderer(document.createElement("div"));
 
   render(component);
-  expect(getConnected().length).toEqual(1);
-  expect(getDisconnected().length).toEqual(0);
+  expect(getConnected()).toHaveLength(1);
+  expect(getDisconnected()).toHaveLength(0);
 
   render();
-  expect(getConnected().length).toEqual(0);
-  expect(getDisconnected().length).toEqual(1);
+  expect(getConnected()).toHaveLength(0);
+  expect(getDisconnected()).toHaveLength(1);
 });

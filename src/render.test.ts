@@ -86,6 +86,6 @@ describe("renderToDom should render", () => {
     const [callback, getCalls] = newProbe<MouseEvent>();
     const result = renderJsonHtmlToDom(div({ onClick: callback }));
     (result as HTMLElement).click();
-    expect(getCalls().length).toEqual(1);
+    expect(getCalls()).toHaveLength(1);
   });
 });
