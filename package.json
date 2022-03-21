@@ -35,7 +35,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "linki": "^0.1.13"
+    "linki": "^0.1.14"
   },
   "devDependencies": {
     "@types/jest": "^27.0.3",
@@ -64,7 +64,9 @@
   "jest": {
     "testEnvironment": "jsdom",
     "preset": "ts-jest/presets/js-with-babel-esm",
-    "extensionsToTreatAsEsm": [".ts"],
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
     "globals": {
       "ts-jest": {
         "useESM": true

@@ -8158,10 +8158,10 @@ linki-ui@^0.0.5:
   dependencies:
     linki "^0.1.5"
 
-linki@^0.1.13:
-  version "0.1.13"
-  resolved "https://registry.yarnpkg.com/linki/-/linki-0.1.13.tgz#062bd72293493e38f2f65d8fc0b278dad65727a8"
-  integrity sha512-px9mn8QbSCARDIotY8DZ7EQaCkhgXoSUxoOpgFzgsHKpYcg1ArRh+NS8cRnvIFKNoJD7kK97Xid67thT9NpTiw==
+linki@^0.1.14:
+  version "0.1.14"
+  resolved "https://registry.yarnpkg.com/linki/-/linki-0.1.14.tgz#c7480ca80dfcb8b8f82ba06647e244c46d536f60"
+  integrity sha512-FIad/kO/CwLmRI0bcPPqHHo1Yc10t6LaQu/hLz7l+BlzBOHDXhfCI+m09a01/ipWVpU5Y+Usg8HKTQnV78buJQ==
 
 linki@^0.1.5:
   version "0.1.5"
