@@ -25,18 +25,6 @@ export const createRenderer = (root: ParentNode): Render => {
   };
 };
 
-/**
- * A boundary that allow children components to render in place without affecting the parent view,
- * and allow to rerender parents with just reusing reference instead of entire dom tree.
- *
- * todo: came up with a better name
- */
-export const createRenderingBoundary = (): [JsonHtml, Render] => {
-  const fragment = document.createDocumentFragment();
-  const renderer = createRenderer(fragment);
-  return [dom(fragment), renderer];
-};
-
 const componentClassName = "component";
 const findComponentNodes = (dom: Node): Element[] => {
   if (dom.nodeType === Node.ELEMENT_NODE) {
