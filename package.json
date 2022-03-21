@@ -34,13 +34,12 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "linki": "^0.1.10",
-    "linki-experimental": "^0.4.0"
+    "linki": "^0.1.13"
   },
   "devDependencies": {
     "@types/jest": "^27.0.3",
-    "@typescript-eslint/eslint-plugin": "^4.3.0",
-    "@typescript-eslint/parser": "^4.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.15.0",
+    "@typescript-eslint/parser": "^5.15.0",
     "esbuild": "^0.14.6",
     "esbuild-jest": "^0.5.0",
     "eslint": "^7.10.0",
@@ -51,7 +50,7 @@
     "eslint-plugin-unused-imports": "^1.1.1",
     "jest": "^27.4.5",
     "linki-ui-storybook": "^0.1.0",
-    "prettier": "^2.5.1",
+    "prettier": "^2.6.0",
     "storybook": "^6.4.9",
     "storybook-addon-turbo-build": "^1.0.1",
     "ts-jest": "^27.1.2",
