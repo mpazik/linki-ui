@@ -25,7 +25,7 @@ export const createRenderer = (root: ParentNode): Render => {
   };
 };
 
-const componentClassName = "component";
+export const componentClassName = "component";
 const findComponentNodes = (dom: Node): Element[] => {
   if (dom.nodeType === Node.ELEMENT_NODE) {
     if ((dom as HTMLElement).classList.contains(componentClassName)) {
@@ -44,14 +44,14 @@ const findComponentNodes = (dom: Node): Element[] => {
 };
 
 export const createComponentRenderer = (parent: HTMLElement): Render => {
+  let existingComponents: Element[] = [];
+
   parent.classList.add(componentClassName);
   parent.addEventListener("disconnected", () => {
     existingComponents.forEach((existingComponent) => {
       existingComponent.dispatchEvent(new CustomEvent("disconnected"));
     });
   });
-
-  let existingComponents: Element[] = [];
 
   return (jsonHtml) => {
     const dom = renderJsonHtmlToDom(jsonHtml ?? undefined);

@@ -35,7 +35,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "linki": "^0.1.14"
+    "linki": "^0.1.15"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",

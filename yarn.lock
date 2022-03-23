@@ -7963,10 +7963,10 @@ linki-ui@^0.0.5:
   dependencies:
     linki "^0.1.5"
 
-linki@^0.1.14:
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/linki/-/linki-0.1.14.tgz#c7480ca80dfcb8b8f82ba06647e244c46d536f60"
-  integrity sha512-FIad/kO/CwLmRI0bcPPqHHo1Yc10t6LaQu/hLz7l+BlzBOHDXhfCI+m09a01/ipWVpU5Y+Usg8HKTQnV78buJQ==
+linki@^0.1.15:
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/linki/-/linki-0.1.15.tgz#a129ac950ceeeb51ab79f802f10b967c54ec2072"
+  integrity sha512-wL6AVVUWZ4l9x1XRZy9c92ULzXLQ1/hr4bc6oUZfJbMFcSpd2J70ptRz9cRwaroI4AIZucc0EssjHMFBp8mbOA==
 
 linki@^0.1.5:
   version "0.1.5"
