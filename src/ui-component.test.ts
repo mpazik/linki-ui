@@ -5,6 +5,7 @@ import type { JsonHtml, JsonHtmlNode } from "./jsonhtml";
 import { div, span } from "./jsonhtml";
 import type { UiComponent } from "./ui-component";
 import { createComponentRenderer, mountComponent } from "./ui-component";
+import type { ItemComponentMountOptions } from "./ui-item-component";
 
 const setupProbeComponent =
   (
@@ -21,12 +22,15 @@ const setupProbeComponent =
   };
 
 const newPropComponent = (
-  content?: JsonHtml
+  content?: JsonHtml,
+  options?: ItemComponentMountOptions
 ): [JsonHtmlNode, () => void[], () => void[]] => {
   const [connected, getConnected] = newProbe();
   const [disconnected, getDisconnected] = newProbe();
   const [child] = mountComponent(
-    setupProbeComponent(connected, disconnected, content)
+    setupProbeComponent(connected, disconnected, content),
+    {},
+    options
   );
   return [child, getConnected, getDisconnected];
 };
@@ -131,4 +135,34 @@ test("nested children are connected and disconnected", () => {
   render();
   expect(getConnected()).toHaveLength(0);
   expect(getDisconnected()).toHaveLength(1);
+});
+
+test("parent is rendered using provided tag", () => {
+  const [component] = newPropComponent(undefined, {
+    parentTag: "p",
+  });
+  const parent = document.createElement("div");
+  const render = createComponentRenderer(parent);
+
+  render(component);
+  expect(parent.innerHTML).toEqual(
+    `<p class="component"><span>test component</span></p>`
+  );
+});
+
+test("parent is rendered using provided element", () => {
+  const parent = document.createElement("p");
+  parent.classList.add("large");
+  parent.setAttribute("data-type", "parent");
+
+  const [component] = newPropComponent(undefined, {
+    parent: parent,
+  });
+  const container = document.createElement("div");
+  const render = createComponentRenderer(container);
+
+  render(component);
+  expect(container.innerHTML).toEqual(
+    `<p class="large component" data-type="parent"><span>test component</span></p>`
+  );
 });

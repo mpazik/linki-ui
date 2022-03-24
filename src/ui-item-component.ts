@@ -4,7 +4,12 @@ import { isEqual } from "linki";
 import type { ComponentIO } from "./components-extra";
 import type { JsonHtml, JsonHtmlNode } from "./jsonhtml";
 import { dom } from "./jsonhtml";
-import { componentClassName, createComponentRenderer } from "./ui-component";
+import type { ComponentMountOptions } from "./ui-component";
+import {
+  componentClassName,
+  createComponentRenderer,
+  getParentForComponentMount,
+} from "./ui-component";
 
 export type UiItemComponent<T, I extends object = {}, O extends object = {}> = (
   a: NamedCallbacks<O & { render: JsonHtml }>
@@ -30,10 +35,37 @@ const enhanceWithId = <ID, S extends object>(
   ) as unknown as NamedCallbacks<S>;
 };
 
+export type ItemComponentMountOptions<ID> = ComponentMountOptions &
+  (
+    | {
+        childrenElementFactory?: (id: ID) => HTMLElement;
+      }
+    | {
+        childrenTag?: string;
+      }
+  );
+
+export const getChildrenForComponentMountFactory = <ID>(
+  options: ItemComponentMountOptions<ID>
+): ((id: ID) => HTMLElement) => {
+  if (
+    (options as { childrenElementFactory?: (id: ID) => HTMLElement })
+      .childrenElementFactory
+  ) {
+    return (id) =>
+      (
+        options as { childrenElementFactory: (id: ID) => HTMLElement }
+      ).childrenElementFactory(id);
+  }
+  const tag = (options as { childrenTag?: string }).childrenTag ?? "div";
+  return () => document.createElement(tag);
+};
+
 export const mountItemComponent = <ID, T, I extends object, O extends object>(
   getId: (item: T) => ID,
   itemComponent: UiItemComponent<T, I, O>,
-  props: NamedItemCallbacks<ID, O>
+  props: NamedItemCallbacks<ID, O>,
+  options: ItemComponentMountOptions<ID> = {}
 ): [JsonHtmlNode, ComponentIO<{ updateItems: T[] }>] => {
   const existingItems = new Map<
     ID,
@@ -45,7 +77,8 @@ export const mountItemComponent = <ID, T, I extends object, O extends object>(
   >();
   let connected = false;
 
-  const parent = document.createElement("div");
+  const parent = getParentForComponentMount(options);
+  const getChildren = getChildrenForComponentMountFactory(options);
   parent.classList.add(componentClassName);
   parent.addEventListener("disconnected", () => {
     for (const [, { node }] of existingItems) {
@@ -80,7 +113,7 @@ export const mountItemComponent = <ID, T, I extends object, O extends object>(
             }
             nodes.push(existing.node);
           } else {
-            const node = document.createElement("div");
+            const node = getChildren(id);
             const render = createComponentRenderer(node);
             const namedCallbacks: NamedCallbacks<O> = enhanceWithId(id, props);
             const { updateItem, stop, start, ...rest } = itemComponent({

@@ -4,7 +4,10 @@ import { newProbe } from "linki";
 import type { JsonHtml, JsonHtmlNode } from "./jsonhtml";
 import { div, span } from "./jsonhtml";
 import { createComponentRenderer } from "./ui-component";
-import type { UiItemComponent } from "./ui-item-component";
+import type {
+  UiItemComponent,
+  ItemComponentMountOptions,
+} from "./ui-item-component";
 import { mountItemComponent } from "./ui-item-component";
 
 type Item = [number, string];
@@ -28,7 +31,8 @@ const setupProbeComponent =
   };
 
 const newPropComponent = (
-  children?: JsonHtml
+  children?: JsonHtml,
+  options?: ItemComponentMountOptions
 ): {
   component: JsonHtmlNode;
   updateItems: Callback<Item[]>;
@@ -44,7 +48,8 @@ const newPropComponent = (
     setupProbeComponent(connected, disconnected, children),
     {
       test: received,
-    }
+    },
+    options
   );
   return { component, updateItems, getConnected, getDisconnected, getReceived };
 };
@@ -158,7 +163,7 @@ test("children content is update when new value is pushed", () => {
   );
 });
 
-test.only("children can communicate with parent", () => {
+test("children can communicate with parent", () => {
   const { component, updateItems, getReceived } = newPropComponent();
   const render = createComponentRenderer(document.createElement("div"));
 
@@ -168,4 +173,41 @@ test.only("children can communicate with parent", () => {
 
   updateItems([[1, "test2"]]);
   expect(getReceived()).toEqual([[1, "from child: test2"]]);
+});
+
+test("parent and children is rendered using provided tag", () => {
+  const { component, updateItems } = newPropComponent(undefined, {
+    childrenTag: "li",
+    parentTag: "ul",
+  });
+  const parent = document.createElement("div");
+  const render = createComponentRenderer(parent);
+
+  render(component);
+  updateItems([[1, "test"]]);
+  expect(parent.innerHTML).toEqual(
+    `<ul class="component"><li class="component">item: test</li></ul>`
+  );
+});
+
+test("parent and children is rendered using provided element", () => {
+  const children = document.createElement("li");
+  children.classList.add("item");
+  children.setAttribute("data-type", "item");
+  const parent = document.createElement("ul");
+  parent.classList.add("list");
+  parent.setAttribute("data-type", "parent");
+
+  const { component, updateItems } = newPropComponent(undefined, {
+    children: children,
+    parent: parent,
+  });
+  const container = document.createElement("div");
+  const render = createComponentRenderer(container);
+
+  render(component);
+  updateItems([[1, "test"]]);
+  expect(container.innerHTML).toEqual(
+    `<ul class="list component" data-type="parent"><li class="item component" data-type="item">item: test</li></ul>`
+  );
 });

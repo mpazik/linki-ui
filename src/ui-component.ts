@@ -91,15 +91,37 @@ export type UiComponent<
   O extends object ? O & { render: JsonHtml } : { render: JsonHtml }
 >;
 
+export type ComponentMountOptions =
+  | {
+      parent?: HTMLElement;
+    }
+  | { parentTag?: string };
+
+export const getParentForComponentMount = (
+  options: ComponentMountOptions
+): HTMLElement => {
+  if ((options as { parent?: HTMLElement }).parent) {
+    return (options as { parent: HTMLElement }).parent.cloneNode(
+      false
+    ) as HTMLElement;
+  }
+  const tag = (options as { parentTag?: string }).parentTag ?? "div";
+  return document.createElement(tag);
+};
+
 export const mountComponent = <
   I extends object | void,
   O extends object | void
 >(
-  ...[component, props]: O extends object
-    ? [UiComponent<I, O>, ComponentIO<O>]
-    : [UiComponent<I, O>]
+  ...[component, props, options]: O extends object
+    ?
+        | [UiComponent<I, O>, ComponentIO<O>]
+        | [UiComponent<I, O>, ComponentIO<O>, ComponentMountOptions | undefined]
+    :
+        | [UiComponent<I, O>]
+        | [UiComponent<I, O>, {}, ComponentMountOptions | undefined]
 ): [JsonHtmlNode, ComponentIO<I>] => {
-  const parent = document.createElement("div");
+  const parent = getParentForComponentMount(options ?? {});
   const render = createComponentRenderer(parent);
   const handlers = component(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
