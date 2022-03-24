@@ -14,7 +14,8 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "rootDir": "src"
+    "rootDir": "src",
+    "allowJs": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "examples/todo-mvp"]
