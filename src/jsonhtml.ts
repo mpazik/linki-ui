@@ -8,7 +8,12 @@ type CustomElementsAttributes = {
   };
 };
 
+interface CustomAttributes {
+  dataSet?: DOMStringMap | undefined;
+}
+
 type Attributes = HTMLElementsAttributes & CustomElementsAttributes;
+type ElementAttributes<T extends HtmlTag> = Attributes[T] & CustomAttributes;
 type HtmlTag = keyof Attributes;
 
 export type JsonHtmlNode = DirtyJsonMlNode;
@@ -17,7 +22,7 @@ export type JsonHtml = DirtyJsonMl;
 export const mapJsonHtml = mapDirtyJsonMl;
 
 type TagProps<T extends HtmlTag = HtmlTag> =
-  | [Attributes[T], ...JsonHtml[]]
+  | [ElementAttributes<T>, ...JsonHtml[]]
   | [...JsonHtml[]];
 
 type JsonHtmlTagFactory<T extends HtmlTag> = (
@@ -26,7 +31,9 @@ type JsonHtmlTagFactory<T extends HtmlTag> = (
 
 const newTagFactory =
   <T extends HtmlTag>(tag: T): JsonHtmlTagFactory<T> =>
-  (...props: [Attributes[T], ...JsonHtml[]] | [...JsonHtml[]]): JsonHtmlNode =>
+  (
+    ...props: [ElementAttributes<T>, ...JsonHtml[]] | [...JsonHtml[]]
+  ): JsonHtmlNode =>
     [tag, ...props] as JsonHtmlNode;
 
 // Custom tag

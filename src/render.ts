@@ -44,6 +44,14 @@ const renderNode = (tag: string, attrs: Attributes, children: Node[]): Node => {
         // @ts-ignore
         node.style[styleKey] = styles[styleKey as keyof CSSStyleDeclaration];
       }
+    } else if (attrKey === "dataSet") {
+      const data: DOMStringMap = attrVal as DOMStringMap;
+      for (const key of Object.keys(data)) {
+        const value = data[key];
+        if (value !== undefined) {
+          node.setAttribute("data-" + key, value);
+        }
+      }
     } else if (typeof attrVal === "boolean") {
       if (attrVal) {
         if (explicitBooleanAttributes.includes(attrKey)) {

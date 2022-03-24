@@ -82,6 +82,15 @@ describe("renderToDom should render", () => {
     "html",
     check(dangerousHtml("<div>Test<p>Hi</p></div>"), "<div>Test<p>Hi</p></div>")
   );
+
+  test(
+    "element with custom data attributes",
+    check(
+      div({ dataSet: { id: "test", name: "something" } }),
+      '<div data-id="test" data-name="something"></div>'
+    )
+  );
+
   test("event handler", () => {
     const [callback, getCalls] = newProbe<MouseEvent>();
     const result = renderJsonHtmlToDom(div({ onClick: callback }));
