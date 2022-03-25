@@ -1,4 +1,5 @@
 import type { Callback, NamedCallbacks } from "linki";
+import { not } from "linki";
 
 import type { ComponentIO, RelaxedComponent } from "./components-extra";
 import type { JsonHtml, JsonHtmlNode } from "./jsonhtml";
@@ -44,34 +45,32 @@ const findComponentNodes = (dom: Node): Element[] => {
 };
 
 export const createComponentRenderer = (parent: HTMLElement): Render => {
-  let existingComponents: Element[] = [];
+  let existing: Element[] = [];
 
   parent.classList.add(componentClassName);
   parent.addEventListener("disconnected", () => {
-    existingComponents.forEach((existingComponent) => {
+    existing.forEach((existingComponent) => {
       existingComponent.dispatchEvent(new CustomEvent("disconnected"));
     });
   });
 
   return (jsonHtml) => {
     const dom = renderJsonHtmlToDom(jsonHtml ?? undefined);
-    const renderedComponents: Element[] = findComponentNodes(dom);
+    const rendered: Element[] = findComponentNodes(dom);
 
-    existingComponents
-      .filter((it) => renderedComponents.indexOf(it) < 0)
-      .forEach((existingComponent) => {
-        existingComponent.dispatchEvent(new CustomEvent("disconnected"));
-      });
+    const removed = existing.filter(not(rendered.includes.bind(rendered)));
+    removed.forEach((existingComponent) => {
+      existingComponent.dispatchEvent(new CustomEvent("disconnected"));
+    });
 
     parent.replaceChildren(dom);
 
-    renderedComponents
-      .filter((it) => existingComponents.indexOf(it) < 0)
-      .forEach((newComponent) => {
-        newComponent.dispatchEvent(new CustomEvent("connected"));
-      });
+    const added = rendered.filter(not(existing.includes.bind(existing)));
+    added.forEach((newComponent) => {
+      newComponent.dispatchEvent(new CustomEvent("connected"));
+    });
 
-    existingComponents = renderedComponents;
+    existing = rendered;
   };
 };
 
