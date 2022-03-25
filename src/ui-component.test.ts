@@ -3,9 +3,8 @@ import { newProbe } from "linki";
 
 import type { JsonHtml, JsonHtmlNode } from "./jsonhtml";
 import { div, span } from "./jsonhtml";
-import type { UiComponent } from "./ui-component";
+import type { ComponentMountOptions, UiComponent } from "./ui-component";
 import { createComponentRenderer, mountComponent } from "./ui-component";
-import type { ItemComponentMountOptions } from "./ui-item-component";
 
 const setupProbeComponent =
   (
@@ -23,7 +22,7 @@ const setupProbeComponent =
 
 const newPropComponent = (
   content?: JsonHtml,
-  options?: ItemComponentMountOptions
+  options?: ComponentMountOptions
 ): [JsonHtmlNode, () => void[], () => void[]] => {
   const [connected, getConnected] = newProbe();
   const [disconnected, getDisconnected] = newProbe();
