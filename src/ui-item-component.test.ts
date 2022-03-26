@@ -1,4 +1,4 @@
-import type { Callback } from "linki";
+import type { ArrayChange, Callback } from "linki";
 import { newProbe } from "linki";
 
 import type { JsonHtml, JsonHtmlNode } from "./jsonhtml";
@@ -37,6 +37,7 @@ const newPropComponent = (
 ): {
   component: JsonHtmlNode;
   updateItems: Callback<Item[]>;
+  changeItems: Callback<ArrayChange<Item, Id>>;
   getConnected: () => void[];
   getDisconnected: () => void[];
   getReceived: () => [number, string][];
@@ -44,7 +45,7 @@ const newPropComponent = (
   const [connected, getConnected] = newProbe();
   const [disconnected, getDisconnected] = newProbe();
   const [received, getReceived] = newProbe<[number, string]>();
-  const [component, { updateItems }] = mountItemComponent(
+  const [component, { updateItems, changeItems }] = mountItemComponent(
     getId,
     setupProbeComponent(connected, disconnected, children),
     {
@@ -52,7 +53,14 @@ const newPropComponent = (
     },
     options
   );
-  return { component, updateItems, getConnected, getDisconnected, getReceived };
+  return {
+    component,
+    updateItems,
+    changeItems,
+    getConnected,
+    getDisconnected,
+    getReceived,
+  };
 };
 
 test("children is connected after component is rendered", () => {
@@ -147,7 +155,7 @@ test("children is reconnected when is added again", () => {
   expect(getConnected()).toHaveLength(2);
 });
 
-test("children content is update when new value is pushed", () => {
+test("children content is updated when new array is pushed", () => {
   const { component, updateItems } = newPropComponent();
   const parent = document.createElement("div");
   const render = createComponentRenderer(parent);
@@ -161,6 +169,84 @@ test("children content is update when new value is pushed", () => {
   updateItems([[1, "test2"]]);
   expect(parent.firstElementChild!.innerHTML).toEqual(
     `<div class="component">item: test2</div>`
+  );
+});
+
+test("children content is update when new value for the item is pushed", () => {
+  const { component, updateItems, changeItems, getConnected } =
+    newPropComponent();
+  const parent = document.createElement("div");
+  const render = createComponentRenderer(parent);
+
+  render(component);
+  updateItems([[1, "test"]]);
+  changeItems(["set", [1, "test2"]]);
+  expect(parent.firstElementChild!.innerHTML).toEqual(
+    `<div class="component">item: test2</div>`
+  );
+  expect(getConnected()).toHaveLength(1);
+});
+
+test("children is added when new item is pushed", () => {
+  const { component, changeItems, getConnected } = newPropComponent();
+  const parent = document.createElement("div");
+  const render = createComponentRenderer(parent);
+
+  render(component);
+  changeItems(["set", [1, "test"]]);
+  expect(parent.firstElementChild!.innerHTML).toEqual(
+    `<div class="component">item: test</div>`
+  );
+  expect(getConnected()).toHaveLength(1);
+});
+
+test("list is updated when item is removed", () => {
+  const { component, updateItems, changeItems, getDisconnected } =
+    newPropComponent();
+  const parent = document.createElement("div");
+  const render = createComponentRenderer(parent);
+
+  render(component);
+  updateItems([
+    [1, "test"],
+    [2, "test2"],
+  ]);
+  changeItems(["del", 1]);
+  expect(parent.firstElementChild!.innerHTML).toEqual(
+    `<div class="component">item: test2</div>`
+  );
+  expect(getDisconnected()).toHaveLength(1);
+});
+
+test("list is updated when last item is removed", () => {
+  const { component, updateItems, changeItems, getDisconnected } =
+    newPropComponent();
+  const parent = document.createElement("div");
+  const render = createComponentRenderer(parent);
+
+  render(component);
+  updateItems([[1, "test"]]);
+  changeItems(["del", 1]);
+  expect(parent.firstElementChild!.innerHTML).toEqual(``);
+  expect(getDisconnected()).toHaveLength(1);
+});
+
+test("list updated wen new array is pushed", () => {
+  const { component, updateItems, changeItems } = newPropComponent();
+  const parent = document.createElement("div");
+  const render = createComponentRenderer(parent);
+
+  render(component);
+  updateItems([[1, "test"]]);
+  changeItems([
+    "to",
+    [
+      [2, "test2"],
+      [3, "test3"],
+    ],
+  ]);
+  expect(parent.firstElementChild!.innerHTML).toEqual(
+    `<div class="component">item: test2</div><div class="component">item: test3</div>`
   );
 });
 

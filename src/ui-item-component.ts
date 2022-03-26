@@ -1,4 +1,4 @@
-import type { Callback, NamedCallbacks } from "linki";
+import type { ArrayChange, Callback, NamedCallbacks } from "linki";
 import { isEqual } from "linki";
 
 import type { ComponentIO } from "./components-extra";
@@ -61,20 +61,21 @@ export const getChildrenForComponentMountFactory = <ID>(
   return () => document.createElement(tag);
 };
 
+type ItemData<T> = {
+  node: Node;
+  last: T;
+  updateItem: Callback<T>;
+};
 export const mountItemComponent = <ID, T, I extends object, O extends object>(
   getId: (item: T) => ID,
   itemComponent: UiItemComponent<T, I, O>,
   props: NamedItemCallbacks<ID, O>,
   options: ItemComponentMountOptions<ID> = {}
-): [JsonHtmlNode, ComponentIO<{ updateItems: T[] }>] => {
-  const existingItems = new Map<
-    ID,
-    {
-      node: Node;
-      last: T;
-      updateItem: Callback<T>;
-    }
-  >();
+): [
+  JsonHtmlNode,
+  ComponentIO<{ updateItems: T[]; changeItems: ArrayChange<T, ID> }>
+] => {
+  const existingItems = new Map<ID, ItemData<T>>();
   let connected = false;
 
   const parent = getParentForComponentMount(options);
@@ -88,71 +89,117 @@ export const mountItemComponent = <ID, T, I extends object, O extends object>(
   });
   parent.addEventListener("connected", () => {
     connected = true;
-    for (const [, { node, updateItem, last }] of existingItems) {
-      node.dispatchEvent(new CustomEvent("connected"));
-      updateItem(last);
+    for (const [, data] of existingItems) {
+      start(data);
     }
   });
+
+  const setup = (id: ID, item: T) => {
+    const node = getChildren(id);
+    const render = createComponentRenderer(node);
+    const namedCallbacks: NamedCallbacks<O> = enhanceWithId(id, props);
+    const { updateItem, stop, start, ...rest } = itemComponent({
+      ...namedCallbacks,
+      render,
+    } as NamedCallbacks<O & { render: JsonHtml }>);
+    if (start) {
+      node.addEventListener("connected", () => (start as Callback)());
+    }
+    if (stop) {
+      node.addEventListener("disconnected", () => (stop as Callback)());
+    }
+
+    const value = {
+      last: item,
+      node,
+      updateItem: updateItem as Callback<T>,
+    };
+    existingItems.set(id, value);
+    return value;
+  };
+  const start = ({ node, updateItem, last }: ItemData<T>) => {
+    node.dispatchEvent(new CustomEvent("connected"));
+    updateItem(last);
+  };
+  const updateData = (existing: ItemData<T>, newItem: T) => {
+    if (isEqual(newItem)(existing.last)) return;
+    existing.last = newItem;
+    existing.updateItem(newItem);
+  };
+  const update = (item: T) => {
+    const id = getId(item);
+    const existing = existingItems.get(id);
+    if (existing) {
+      updateData(existing, item);
+    } else {
+      const data = setup(id, item);
+      parent.appendChild(data.node);
+      start(data);
+    }
+  };
+  const removeItem = (id: ID) => {
+    const existing = existingItems.get(id);
+    if (!existing) return;
+
+    existing.node.dispatchEvent(new CustomEvent("disconnected"));
+    existingItems.delete(id);
+    parent.removeChild(existing.node);
+  };
+  const updateItems = (items: T[]) => {
+    const nodes: Node[] = [];
+    const usedItems = new Set<ID>();
+    const newItems = new Set<ID>();
+
+    for (const item of items) {
+      const id = getId(item);
+      usedItems.add(id);
+      const existing = existingItems.get(id);
+      if (existing) {
+        updateData(existing, item);
+        nodes.push(existing.node);
+      } else {
+        const { node } = setup(id, item);
+
+        newItems.add(id);
+        nodes.push(node);
+      }
+    }
+
+    for (const [id, { node }] of existingItems.entries()) {
+      if (!usedItems.has(id)) {
+        node.dispatchEvent(new CustomEvent("disconnected"));
+        existingItems.delete(id);
+      }
+    }
+    parent.replaceChildren(...nodes);
+
+    if (connected) {
+      for (const id of newItems) {
+        start(existingItems.get(id)!);
+      }
+    }
+  };
 
   return [
     dom(parent),
     {
-      updateItems: (items: T[]) => {
-        const nodes: Node[] = [];
-        const usedItems = new Set<ID>();
-        const newItems = new Set<ID>();
-
-        for (const item of items) {
-          const id = getId(item);
-          usedItems.add(id);
-          const existing = existingItems.get(id);
-          if (existing) {
-            if (!isEqual(item)(existing.last)) {
-              existing.updateItem(item);
-              existing.last = item;
-            }
-            nodes.push(existing.node);
-          } else {
-            const node = getChildren(id);
-            const render = createComponentRenderer(node);
-            const namedCallbacks: NamedCallbacks<O> = enhanceWithId(id, props);
-            const { updateItem, stop, start, ...rest } = itemComponent({
-              ...namedCallbacks,
-              render,
-            } as NamedCallbacks<O & { render: JsonHtml }>);
-            if (start) {
-              node.addEventListener("connected", () => (start as Callback)());
-            }
-            if (stop) {
-              node.addEventListener("disconnected", () => (stop as Callback)());
-            }
-
-            newItems.add(id);
-            existingItems.set(id, {
-              last: item,
-              node,
-              updateItem: updateItem as Callback<T>,
-            });
-            nodes.push(node);
+      changeItems: (op) => {
+        switch (op[0]) {
+          case "to": {
+            updateItems(op[1]);
+            return;
           }
-        }
-
-        for (const [id, { node }] of existingItems.entries()) {
-          if (!usedItems.has(id)) {
-            node.dispatchEvent(new CustomEvent("disconnected"));
-            existingItems.delete(id);
+          case "set": {
+            update(op[1]);
+            return;
           }
-        }
-        parent.replaceChildren(...nodes);
-
-        if (connected) {
-          for (const id of newItems) {
-            const { node, updateItem, last } = existingItems.get(id)!;
-            node.dispatchEvent(new CustomEvent("connected"));
-            updateItem(last);
+          case "del": {
+            removeItem(op[1]);
+            return;
           }
         }
       },
+      updateItems,
     },
   ];
 };
