@@ -19,7 +19,7 @@ const setupProbeComponent =
     connected: Callback,
     disconnected: Callback,
     children?: JsonHtml
-  ): UiItemComponent<Item, {}, { test: string }> =>
+  ): UiItemComponent<Item, { test: string }> =>
   ({ render, test }) => {
     return {
       start: () => connected(),

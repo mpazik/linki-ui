@@ -11,9 +11,9 @@ import {
   getParentForComponentMount,
 } from "./ui-component";
 
-export type UiItemComponent<T, I extends object = {}, O extends object = {}> = (
+export type UiItemComponent<T, O extends object = {}> = (
   a: NamedCallbacks<O & { render: JsonHtml }>
-) => NamedCallbacks<I & { start?: void; stop?: void; updateItem: T }>;
+) => NamedCallbacks<{ start?: void; stop?: void; updateItem: T }>;
 
 export type NamedItemCallbacks<ID, T extends object> = {
   [K in keyof T]: Callback<[ID, T[K]]>;
@@ -66,9 +66,9 @@ type ItemData<T> = {
   last: T;
   updateItem: Callback<T>;
 };
-export const mountItemComponent = <ID, T, I extends object, O extends object>(
+export const mountItemComponent = <ID, T, O extends object>(
   getId: (item: T) => ID,
-  itemComponent: UiItemComponent<T, I, O>,
+  itemComponent: UiItemComponent<T, O>,
   props: NamedItemCallbacks<ID, O>,
   options: ItemComponentMountOptions<ID> = {}
 ): [
@@ -98,7 +98,7 @@ export const mountItemComponent = <ID, T, I extends object, O extends object>(
     const node = getChildren(id);
     const render = createComponentRenderer(node);
     const namedCallbacks: NamedCallbacks<O> = enhanceWithId(id, props);
-    const { updateItem, stop, start, ...rest } = itemComponent({
+    const { updateItem, stop, start } = itemComponent({
       ...namedCallbacks,
       render,
     } as NamedCallbacks<O & { render: JsonHtml }>);
