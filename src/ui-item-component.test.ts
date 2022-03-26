@@ -11,7 +11,8 @@ import type {
 import { mountItemComponent } from "./ui-item-component";
 
 type Item = [number, string];
-const getId = (item: Item): number => item[0];
+type Id = number;
+const getId = (item: Item): Id => item[0];
 
 const setupProbeComponent =
   (
@@ -32,7 +33,7 @@ const setupProbeComponent =
 
 const newPropComponent = (
   children?: JsonHtml,
-  options?: ItemComponentMountOptions
+  options?: ItemComponentMountOptions<Id>
 ): {
   component: JsonHtmlNode;
   updateItems: Callback<Item[]>;
@@ -199,7 +200,7 @@ test("parent and children is rendered using provided element", () => {
   parent.setAttribute("data-type", "parent");
 
   const { component, updateItems } = newPropComponent(undefined, {
-    children: children,
+    childrenElementFactory: () => children,
     parent: parent,
   });
   const container = document.createElement("div");
