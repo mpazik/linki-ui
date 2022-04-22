@@ -27,51 +27,24 @@
     "/dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc",
+    "build": "tdl-build",
     "prepack": "yarn build",
-    "lint": "yarn eslint . --ext .ts && tsc --noEmit",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "lint": "tdl-lint",
+    "test": "tdl-test",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "linki": "^0.1.15"
+    "linki": "^0.1.22"
   },
   "devDependencies": {
-    "@types/jest": "^27.4.1",
-    "@typescript-eslint/eslint-plugin": "^5.15.0",
-    "@typescript-eslint/parser": "^5.15.0",
-    "eslint": "^7.10.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-import-resolver-node": "^0.3.4",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-prettier": "^3.4.0",
-    "eslint-plugin-unused-imports": "^1.1.1",
-    "jest": "^27.5.1",
     "linki-ui-storybook": "^0.1.0",
-    "prettier": "^2.6.0",
     "storybook": "^6.4.9",
     "storybook-addon-turbo-build": "^1.0.1",
-    "ts-jest": "^27.1.3",
-    "typescript": "^4.5.4"
+    "typescript-dev-loop": "^0.0.4"
   },
-  "eslintIgnore": [
-    "node_modules",
-    "dist"
-  ],
-  "jest": {
-    "testEnvironment": "jsdom",
-    "preset": "ts-jest/presets/js-with-ts-esm",
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "globals": {
-      "ts-jest": {
-        "useESM": true
-      }
-    },
-    "moduleNameMapper": {
-      "^(\\.{1,2}/.*)\\.js$": "$1"
-    }
+  "eslintConfig": {
+    "root": true,
+    "extends": "./node_modules/typescript-dev-loop/config/eslint.json"
   }
 }

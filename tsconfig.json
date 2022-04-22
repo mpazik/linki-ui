@@ -1,22 +1,11 @@
 {
-  "compilerOptions": {
-    "lib": [
-      "es2019",
-      "dom"
-    ],
-    "declaration": true,
-    "target": "ES2018",
-    "outDir": "dist",
-    "skipLibCheck": true,
-    "strict": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "rootDir": "src",
-    "allowJs": true
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "examples/todo-mvp"]
+  "extends": "./node_modules/typescript-dev-loop/config/tsconfig.json",
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "src/**/*.test.ts"
+  ]
 }

@@ -8,6 +8,7 @@ yarn-error.log*
 
 # IDEs
 .idea
+.vscode
 
 # Build output
 /dist
