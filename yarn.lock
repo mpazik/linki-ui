@@ -7812,10 +7812,10 @@ linki-ui@^0.0.5:
   dependencies:
     linki "^0.1.5"
 
-linki@^0.1.22:
-  version "0.1.22"
-  resolved "https://registry.yarnpkg.com/linki/-/linki-0.1.22.tgz#40aaa66e695f945b2dee49f943681ae6e9145dc2"
-  integrity sha512-UUoE38i2fcYSZHVCkEMS3s30QL9p7WCGgNek7WdHaJ18fjYXDy3VGnotEkd7dUUscANI4lAtE4P9cVjg8BNChQ==
+linki@^0.1.25:
+  version "0.1.25"
+  resolved "https://registry.yarnpkg.com/linki/-/linki-0.1.25.tgz#f088bdc1eddac55e68615b825b31d5e351a50340"
+  integrity sha512-Fzizlp8L5bcIPHF1Ak78/L4jt1VwjntMgWyKwj/owIaH3Zk0CX4OIESGDZ2p+J2B2GUiwIbZ9lA+pW5WRrQPvw==
 
 linki@^0.1.5:
   version "0.1.20"
