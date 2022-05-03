@@ -1,5 +1,6 @@
 import type { ArrayChange, Callback, NamedCallbacks } from "linki";
 import { isEqual } from "linki";
+import type { AppendDirection } from "linki/src";
 
 import type { ComponentIO } from "./components-extra";
 import type { JsonHtml, JsonHtmlNode } from "./jsonhtml";
@@ -35,8 +36,9 @@ const enhanceWithId = <ID, S extends object>(
   ) as unknown as NamedCallbacks<S>;
 };
 
-export type ItemComponentMountOptions<ID> = ComponentMountOptions &
-  (
+export type ItemComponentMountOptions<ID> = ComponentMountOptions & {
+  direction?: AppendDirection;
+} & (
     | {
         childrenElementFactory?: (id: ID) => HTMLElement;
       }
@@ -70,13 +72,14 @@ export const mountItemComponent = <ID, T, O extends object>(
   getId: (item: T) => ID,
   itemComponent: UiItemComponent<T, O>,
   props: NamedItemCallbacks<ID, O>,
-  options: ItemComponentMountOptions<ID> = {}
+  options: ItemComponentMountOptions<ID> = { direction: "append" }
 ): [
   JsonHtmlNode,
   ComponentIO<{ updateItems: T[]; changeItems: ArrayChange<T, ID> }>
 ] => {
   const existingItems = new Map<ID, ItemData<T>>();
   let connected = false;
+  const direction = options.direction;
 
   const parent = getParentForComponentMount(options);
   const getChildren = getChildrenForComponentMountFactory(options);
@@ -133,7 +136,11 @@ export const mountItemComponent = <ID, T, O extends object>(
       updateData(existing, item);
     } else {
       const data = setup(id, item);
-      parent.appendChild(data.node);
+      if (direction === "append") {
+        parent.appendChild(data.node);
+      } else {
+        parent.prepend(data.node);
+      }
       start(data);
     }
   };
