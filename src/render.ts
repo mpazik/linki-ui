@@ -26,6 +26,9 @@ const renderNode = (tag: string, attrs: Attributes, children: Node[]): Node => {
 
   for (const attrKey of Object.keys(attrs)) {
     const attrVal = attrs[attrKey];
+    if (attrVal === undefined) {
+      continue; // ignore undefined attributes
+    }
     if (attrKey === "id") {
       node.id = attrVal as unknown as string;
     } else if (attrKey === "class") {

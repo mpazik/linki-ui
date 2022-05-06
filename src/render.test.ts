@@ -27,6 +27,10 @@ describe("renderToDom should render", () => {
     check(div({ class: "my-class" }), '<div class="my-class"></div>')
   );
   test(
+    "element with undefined class",
+    check(div({ class: undefined }), "<div></div>")
+  );
+  test(
     "element with two classes",
     check(
       div({ class: "my-class your-class" }),
