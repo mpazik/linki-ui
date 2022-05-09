@@ -6,6 +6,9 @@ export const getTarget = (event: Event): HTMLElement =>
 export const getTargetInput = (event: Event): HTMLInputElement =>
   event.target as HTMLInputElement;
 
+export const getCurrentTarget = (event: Event): HTMLElement =>
+  event.currentTarget as HTMLElement;
+
 export const inputValue = (input: HTMLInputElement): string => input.value;
 export const inputChecked = (input: HTMLInputElement): boolean => input.checked;
 
