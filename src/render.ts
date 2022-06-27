@@ -22,7 +22,8 @@ const renderNode = (tag: string, attrs: Attributes, children: Node[]): Node => {
     children.forEach((child) => fragment.appendChild(child));
     return fragment;
   }
-  const node = document.createElement(tag);
+  const is = attrs["is"] as string;
+  const node = document.createElement(tag, is ? { is } : undefined);
 
   for (const attrKey of Object.keys(attrs)) {
     const attrVal = attrs[attrKey];
